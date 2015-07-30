@@ -1,0 +1,26 @@
+{
+  "build_systems": [
+    {
+      "cmd": [
+        "/usr/local/bin/python",
+        "-m",
+        "unittest",
+        "discover"
+      ],
+      "name": "Python Test",
+      "working_dir": "/Users/drautb/GitHub/drautb/haystack/haystack"
+    }
+  ],
+  "folders": [
+    {
+      "file_exclude_patterns": [
+        "__init__.py"
+      ],
+      "folder_exclude_patterns": [
+        "__pycache__"
+      ],
+      "follow_symlinks": true,
+      "path": "."
+    }
+  ]
+}

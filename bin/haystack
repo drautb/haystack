@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+python haystack/starter.py
