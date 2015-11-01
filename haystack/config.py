@@ -63,8 +63,11 @@ class Config:
         self.refresh_config()
         return self.config.get(PATHS_TO_FILES_SECTION, HAYSTACK_ROOT)
 
+    def staging_root(self):
+        return os.path.join(self.haystack_root(), STAGING_DIRECTORY)
+
     def staging_directory(self, device_id):
-        return os.path.join(self.haystack_root(), STAGING_DIRECTORY, device_id)
+        return os.path.join(self.staging_root(), device_id)
 
     def thumbnail_path_pattern(self):
         self.refresh_config()

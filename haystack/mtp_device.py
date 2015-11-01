@@ -108,7 +108,7 @@ class MTPDevice:
         return files_in_folders
 
     def __get_staging_dir(self):
-        return "{}/staging/{}".format(self.config.haystack_root(), self.mtp.get_serialnumber())
+        return self.config.staging_directory(self.mtp.get_serialnumber())
 
     def __transfer_file(self, src_file, dest_dir):
         dest_file = '{}/{}'.format(dest_dir, src_file.filename)

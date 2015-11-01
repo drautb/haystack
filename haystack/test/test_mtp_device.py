@@ -52,6 +52,7 @@ class TestMTPDevice(unittest.TestCase):
         self.mock_config = MagicMock()
         self.mock_config.mtp_media_directories.return_value = ['DCIM', 'Pictures']
         self.mock_config.haystack_root.return_value = '/haystack'
+        self.mock_config.staging_directory.return_value = '/haystack/staging/serial-number'
 
         self.mock_mtp = MagicMock(spec=pymtp.MTP)
         self.setUp_mtp_get_parent_folders(self.mock_mtp)

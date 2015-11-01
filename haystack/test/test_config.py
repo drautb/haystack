@@ -83,6 +83,14 @@ class TestConfig(unittest.TestCase):
         actual_value = self.test_model.haystack_root()
         self.assertEqual(actual_value, '/root')
 
+    def test_staging_root_should_refresh_the_config(self):
+        self.test_model.staging_root()
+        self.assertEqual(self.mock_config_parser.read.call_count, 2)
+
+    def test_staging_root_should_return_the_right_directory(self):
+        actual_value = self.test_model.staging_root()
+        self.assertEqual(actual_value, '/root/staging')
+
     def test_staging_directory_should_refresh_the_config(self):
         self.test_model.staging_directory('device-id')
         self.assertEqual(self.mock_config_parser.read.call_count, 2)
