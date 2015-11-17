@@ -32,5 +32,9 @@
       "follow_symlinks": true,
       "path": "."
     }
-  ]
+  ],
+  "settings": {
+    "rulers": [120],
+    "tab_size": 4
+  }
 }
