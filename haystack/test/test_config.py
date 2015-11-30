@@ -15,7 +15,8 @@ def mock_config(*args):
             ('PathsToFiles', 'HaystackRoot'): '/root',
             ('PathsToFiles', 'ThumbnailPath'): '/thumbnails',
             ('PathsToFiles', 'PicturePath'): '/pictures',
-            ('PathsToFiles', 'VideoPath'): '/videos'}[args]
+            ('PathsToFiles', 'VideoPath'): '/videos',
+            ('PathsToFiles', 'ThumbnailSize'): '128'}[args]
 
 
 class TestConfig(unittest.TestCase):
@@ -122,6 +123,14 @@ class TestConfig(unittest.TestCase):
     def test_video_path_pattern_should_return_the_right_directory(self):
         actual_value = self.test_model.video_path_pattern()
         self.assertEqual(actual_value, '/videos')
+
+    def test_thumbnail_size_should_refresh_the_config(self):
+        self.test_model.thumbnail_size()
+        self.assertEqual(self.mock_config_parser.read.call_count, 2)
+
+    def test_thumbnail_size_should_return_the_right_directory(self):
+        actual_value = self.test_model.thumbnail_size()
+        self.assertEqual(actual_value, '128')
 
 
 if __name__ == '__main__':

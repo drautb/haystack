@@ -19,6 +19,7 @@ HAYSTACK_ROOT = 'HaystackRoot'
 THUMBNAIL_PATH = 'ThumbnailPath'
 PICTURE_PATH = 'PicturePath'
 VIDEO_PATH = 'VideoPath'
+THUMBNAIL_SIZE = 'ThumbnailSize'
 
 STAGING_DIRECTORY = 'staging'
 DELIMITER = ','
@@ -80,3 +81,7 @@ class Config:
     def video_path_pattern(self):
         self.refresh_config()
         return self.config.get(PATHS_TO_FILES_SECTION, VIDEO_PATH)
+
+    def thumbnail_size(self):
+        self.refresh_config()
+        return self.config.get(PATHS_TO_FILES_SECTION, THUMBNAIL_SIZE)
