@@ -28,10 +28,6 @@ def mock_join(*args):
     return '/'.join(args)
 
 
-def mock_splitext(path):
-    return (path, '.jpg')
-
-
 class TestUSBDevice(unittest.TestCase):
     def setUp(self):
         self.mock_walk = patch('os.walk').start()
@@ -42,9 +38,6 @@ class TestUSBDevice(unittest.TestCase):
 
         self.mock_join = patch('os.path.join').start()
         self.mock_join.side_effect = mock_join
-
-        self.mock_splitext = patch('os.path.splitext').start()
-        self.mock_splitext.side_effect = mock_splitext
 
         self.mock_shutil_move = patch('shutil.move').start()
 
