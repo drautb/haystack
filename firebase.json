@@ -1,0 +1,4 @@
+{
+    "firebase": "haystack-index-dev",
+    "rules": "security-rules.bolt"
+}
