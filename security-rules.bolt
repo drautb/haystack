@@ -1,0 +1,31 @@
+// No one should be able to 'login' and see or change anything.
+// Only reads/writes should be done by me, via API token.
+path / {
+    read() = false;
+    write() = false;
+}
+
+path /media {
+    index() { return ['dateTaken', 'dateIndexed', 'hash']; }
+}
+
+path /media/$mediaid is Media {
+}
+
+type Media {
+    pathToMedia: String,
+    pathToThumbnail: String,
+    dateTaken: Number,
+    dateIndexed: Number,
+    sourceDeviceId: String,
+    hash: MD5Hash,
+    type: MediaType
+}
+
+type MD5Hash extends String {
+    validate() = this.length == 32;
+}
+
+type MediaType extends String {
+    validate() = this == 'JPG' || this == 'JPEG' || this == 'MP4';
+}
