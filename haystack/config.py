@@ -9,6 +9,7 @@ TIMING_SECTION = 'Timing'
 MTP_SECTION = 'MTP'
 USB_SECTION = 'USB'
 PATHS_TO_FILES_SECTION = 'PathsToFiles'
+INDEX_SECTION = 'Index'
 
 # Config Keys
 EXECUTION_INTERVAL = 'ExecutionIntervalInSeconds'
@@ -20,6 +21,8 @@ THUMBNAIL_PATH = 'ThumbnailPath'
 PICTURE_PATH = 'PicturePath'
 VIDEO_PATH = 'VideoPath'
 THUMBNAIL_SIZE = 'ThumbnailSize'
+FIREBASE_NAME = 'Firebase'
+FIREBASE_SECRET = 'Secret'
 
 STAGING_DIRECTORY = 'staging'
 DELIMITER = ','
@@ -85,3 +88,11 @@ class Config:
     def thumbnail_size(self):
         self.refresh_config()
         return self.config.get(PATHS_TO_FILES_SECTION, THUMBNAIL_SIZE)
+
+    def firebase_name(self):
+        self.refresh_config()
+        return self.config.get(INDEX_SECTION, FIREBASE_NAME)
+
+    def firebase_secret(self):
+        self.refresh_config()
+        return self.config.get(INDEX_SECTION, FIREBASE_SECRET)

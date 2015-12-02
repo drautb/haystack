@@ -16,7 +16,9 @@ def mock_config(*args):
             ('PathsToFiles', 'ThumbnailPath'): '/thumbnails',
             ('PathsToFiles', 'PicturePath'): '/pictures',
             ('PathsToFiles', 'VideoPath'): '/videos',
-            ('PathsToFiles', 'ThumbnailSize'): '128'}[args]
+            ('PathsToFiles', 'ThumbnailSize'): '128',
+            ('Index', 'Firebase'): 'test-firebase-name',
+            ('Index', 'Secret'): 'test-firebase-secret'}[args]
 
 
 class TestConfig(unittest.TestCase):
@@ -132,6 +134,21 @@ class TestConfig(unittest.TestCase):
         actual_value = self.test_model.thumbnail_size()
         self.assertEqual(actual_value, '128')
 
+    def test_firebase_name_should_refresh_the_config(self):
+        self.test_model.firebase_name()
+        self.assertEqual(self.mock_config_parser.read.call_count, 2)
+
+    def test_firebase_name_should_return_the_right_value(self):
+        actual_value = self.test_model.firebase_name()
+        self.assertEqual(actual_value, 'test-firebase-name')
+
+    def test_firebase_secret_should_refresh_the_config(self):
+        self.test_model.firebase_secret()
+        self.assertEqual(self.mock_config_parser.read.call_count, 2)
+
+    def test_firebase_secret_should_return_the_right_value(self):
+        actual_value = self.test_model.firebase_secret()
+        self.assertEqual(actual_value, 'test-firebase-secret')
 
 if __name__ == '__main__':
     unittest.main()
