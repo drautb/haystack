@@ -2,9 +2,8 @@ import ffvideo
 import logging
 import os
 
+from file import File
 from PIL import Image
-
-IMAGE_EXTENSIONS = ['.jpg', '.jpeg']
 
 
 class ThumbnailGenerator:
@@ -27,9 +26,9 @@ class ThumbnailGenerator:
     def generate_thumbnail(self, path_to_file, path_to_thumbnail):
         thumbnail_size = self.config.thumbnail_size()
 
-        _, file_extension = os.path.splitext(path_to_file)
+        f = File(path_to_file)
 
-        if file_extension in IMAGE_EXTENSIONS:
+        if f.is_image():
             original_image = Image.open(path_to_file)
             thumbnail_image = original_image.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
             thumbnail_image.save(path_to_thumbnail)
