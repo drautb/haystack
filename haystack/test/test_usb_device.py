@@ -60,9 +60,9 @@ class TestUSBDevice(unittest.TestCase):
         self.mock_join_patcher.stop()
         self.mock_shutil_move_patcher.stop()
 
-    def test_transfer_media_should_use_the_device_id_to_get_the_staging_directory(self):
+    def test_transfer_media_should_use_the_same_staging_directory_for_all_usb_devices(self):
         self.test_model.transfer_media('/Volumes/my-dev', 'my-dev')
-        self.mock_config.staging_directory.assert_called_once_with('my-dev')
+        self.mock_config.staging_directory.assert_called_once_with('USB')
 
     def test_transfer_media_should_transfer_the_right_media_files(self):
         self.test_model.transfer_media('/Volumes/my-dev', 'my-dev')

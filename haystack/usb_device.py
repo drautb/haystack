@@ -6,6 +6,8 @@ from config import Config
 from file import File
 from util import Util
 
+USB_DEVICE_ID = 'USB'
+
 
 class USBDevice:
     def __init__(self, config=None, util=None):
@@ -20,7 +22,9 @@ class USBDevice:
 
     def transfer_media(self, device_path, device_id):
         paths_to_index = self.config.usb_media_directories()
-        dest_dir = self.config.staging_directory(device_id)
+        dest_dir = self.config.staging_directory(USB_DEVICE_ID)
+        logging.info('Transferring media from USB device. device_id=%s dest_dir=%s device_path=%s paths_to_index=%s',
+                     device_id, dest_dir, device_path, paths_to_index)
         for p in paths_to_index:
             media_path = os.path.join(device_path, p)
             if os.path.isdir(media_path):
