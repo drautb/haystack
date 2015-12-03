@@ -74,16 +74,16 @@ class Config:
         return os.path.join(self.staging_root(), device_id)
 
     def thumbnail_path_pattern(self):
-        self.refresh_config()
-        return self.config.get(PATHS_TO_FILES_SECTION, THUMBNAIL_PATH)
+        pattern = self.config.get(PATHS_TO_FILES_SECTION, THUMBNAIL_PATH)
+        return os.path.join(self.haystack_root(), pattern)
 
     def picture_path_pattern(self):
-        self.refresh_config()
-        return self.config.get(PATHS_TO_FILES_SECTION, PICTURE_PATH)
+        pattern = self.config.get(PATHS_TO_FILES_SECTION, PICTURE_PATH)
+        return os.path.join(self.haystack_root(), pattern)
 
     def video_path_pattern(self):
-        self.refresh_config()
-        return self.config.get(PATHS_TO_FILES_SECTION, VIDEO_PATH)
+        pattern = self.config.get(PATHS_TO_FILES_SECTION, VIDEO_PATH)
+        return os.path.join(self.haystack_root(), pattern)
 
     def thumbnail_size(self):
         self.refresh_config()

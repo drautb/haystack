@@ -13,9 +13,9 @@ def mock_config(*args):
             ('USB', 'MountPoints'): '/Volumes',
             ('USB', 'Ignore'): 'Macintosh HD',
             ('PathsToFiles', 'HaystackRoot'): '/root',
-            ('PathsToFiles', 'ThumbnailPath'): '/thumbnails',
-            ('PathsToFiles', 'PicturePath'): '/pictures',
-            ('PathsToFiles', 'VideoPath'): '/videos',
+            ('PathsToFiles', 'ThumbnailPath'): 'thumbnails',
+            ('PathsToFiles', 'PicturePath'): 'pictures',
+            ('PathsToFiles', 'VideoPath'): 'videos',
             ('PathsToFiles', 'ThumbnailSize'): '128',
             ('Index', 'Firebase'): 'test-firebase-name',
             ('Index', 'Secret'): 'test-firebase-secret'}[args]
@@ -108,7 +108,7 @@ class TestConfig(unittest.TestCase):
 
     def test_thumbnail_path_pattern_should_return_the_right_directory(self):
         actual_value = self.test_model.thumbnail_path_pattern()
-        self.assertEqual(actual_value, '/thumbnails')
+        self.assertEqual(actual_value, '/root/thumbnails')
 
     def test_picture_path_pattern_should_refresh_the_config(self):
         self.test_model.picture_path_pattern()
@@ -116,7 +116,7 @@ class TestConfig(unittest.TestCase):
 
     def test_picture_path_pattern_should_return_the_right_directory(self):
         actual_value = self.test_model.picture_path_pattern()
-        self.assertEqual(actual_value, '/pictures')
+        self.assertEqual(actual_value, '/root/pictures')
 
     def test_video_path_pattern_should_refresh_the_config(self):
         self.test_model.video_path_pattern()
@@ -124,7 +124,7 @@ class TestConfig(unittest.TestCase):
 
     def test_video_path_pattern_should_return_the_right_directory(self):
         actual_value = self.test_model.video_path_pattern()
-        self.assertEqual(actual_value, '/videos')
+        self.assertEqual(actual_value, '/root/videos')
 
     def test_thumbnail_size_should_refresh_the_config(self):
         self.test_model.thumbnail_size()
