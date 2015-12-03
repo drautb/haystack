@@ -6,7 +6,8 @@ IMAGE_EXTENSIONS = [
 ]
 
 VIDEO_EXTENSIONS = [
-    '.mp4'
+    '.mp4',
+    '.mts'
 ]
 
 

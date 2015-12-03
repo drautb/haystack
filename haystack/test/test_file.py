@@ -43,6 +43,18 @@ class TestFile(unittest.TestCase):
         self.assertTrue(test_file.is_video())
         self.assertEqual(test_file.media_type(), 'MP4')
 
+    def test_it_should_tell_the_truth_about_mts_files(self):
+        test_file = File('/path/to/file.mts')
+        self.assertFalse(test_file.is_image())
+        self.assertTrue(test_file.is_video())
+        self.assertEqual(test_file.media_type(), 'MTS')
+
+    def test_it_should_tell_the_truth_about_MTS_files(self):
+        test_file = File('/path/to/file.MTS')
+        self.assertFalse(test_file.is_image())
+        self.assertTrue(test_file.is_video())
+        self.assertEqual(test_file.media_type(), 'MTS')
+
 
 if __name__ == '__main__':
     unittest.main()
