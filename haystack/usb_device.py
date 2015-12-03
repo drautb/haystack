@@ -3,6 +3,7 @@ import os
 import shutil
 
 from config import Config
+from file import File
 from util import Util
 
 
@@ -35,15 +36,17 @@ class USBDevice:
         return
 
     def __transfer_file(self, path, filename, dest_dir):
+        try:
+            File(filename)
+        except RuntimeError:
+            logging.warn('Found unrecognized file in folders to index, skipping. path=%s filename=%s', path, filename)
+            return
+
         # We gen a random hash for the dest file name to avoid conflicts since
         # we're flattening the directory structure.
         dest_filename = '{}{}'.format(self.util.get_uuid(),
-                                      self.__get_extension(filename))
+                                      File(filename).ext())
         dest_file = os.path.join(dest_dir, dest_filename)
         src_file = os.path.join(path, filename)
         logging.info('Transferring file from USB device. src_file=%s dest_file=%s', src_file, dest_file)
         shutil.move(src_file, dest_file)
-
-    def __get_extension(self, filename):
-        filename, extension = os.path.splitext(filename)
-        return extension

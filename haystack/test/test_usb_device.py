@@ -10,7 +10,7 @@ from usb_device import USBDevice
 
 def mock_walk(*args):
     return [(args[0], None, ['file-top.jpg']),
-            (args[0] + '/subfolder1', None, ['file-1.jpg']),
+            (args[0] + '/subfolder1', None, ['file-1.jpg', 'unrecognized.txt']),
             (args[0] + '/subfolder1/subfolder2', None, ['file-2.jpg'])]
 
 
@@ -30,16 +30,20 @@ def mock_join(*args):
 
 class TestUSBDevice(unittest.TestCase):
     def setUp(self):
-        self.mock_walk = patch('os.walk').start()
+        self.mock_walk_patcher = patch('os.walk')
+        self.mock_walk = self.mock_walk_patcher.start()
         self.mock_walk.side_effect = mock_walk
 
-        self.mock_isdir = patch('os.path.isdir').start()
+        self.mock_isdir_patcher = patch('os.path.isdir')
+        self.mock_isdir = self.mock_isdir_patcher.start()
         self.mock_isdir.side_effect = mock_isdir
 
-        self.mock_join = patch('os.path.join').start()
+        self.mock_join_patcher = patch('os.path.join')
+        self.mock_join = self.mock_join_patcher.start()
         self.mock_join.side_effect = mock_join
 
-        self.mock_shutil_move = patch('shutil.move').start()
+        self.mock_shutil_move_patcher = patch('shutil.move')
+        self.mock_shutil_move = self.mock_shutil_move_patcher.start()
 
         self.mock_config = MagicMock(spec=config.Config)
         self.mock_config.usb_media_directories.return_value = ['to-index', 'also-to-index', 'third-to-index']
@@ -49,6 +53,12 @@ class TestUSBDevice(unittest.TestCase):
         self.mock_util.get_uuid.return_value = 'some-uuid'
 
         self.test_model = USBDevice(self.mock_config, self.mock_util)
+
+    def tearDown(self):
+        self.mock_walk_patcher.stop()
+        self.mock_isdir_patcher.stop()
+        self.mock_join_patcher.stop()
+        self.mock_shutil_move_patcher.stop()
 
     def test_transfer_media_should_use_the_device_id_to_get_the_staging_directory(self):
         self.test_model.transfer_media('/Volumes/my-dev', 'my-dev')

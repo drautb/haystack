@@ -10,7 +10,6 @@ from pymtp import LIBMTP_Folder
 from pymtp import LIBMTP_File
 
 
-@patch('os.path')
 class TestMTPDevice(unittest.TestCase):
 
     def mock_folder(self, name, id, parent_id=0):
@@ -69,43 +68,53 @@ class TestMTPDevice(unittest.TestCase):
 
         self.test_model = MTPDevice(self.mock_config, self.mock_mtp, self.mock_util)
 
-    def test_transfer_media_should_handle_connection_errors(self, mock_path):
+    def test_transfer_media_should_handle_connection_errors(self):
         self.mock_mtp.connect.side_effect = Exception('Some connection error')
         self.test_model.transfer_media()
 
-    def test_transfer_media_should_not_disconnect_if_connect_failed(self, mock_path):
+    def test_transfer_media_should_not_disconnect_if_connect_failed(self):
         self.mock_mtp.connect.side_effect = Exception('Some connection error')
         self.test_model.transfer_media()
         self.mock_mtp.disconnect.assert_not_called()
 
-    def test_transfer_media_should_do_nothing_if_no_devices_are_connected(self, mock_path):
+    def test_transfer_media_should_do_nothing_if_no_devices_are_connected(self):
         self.mock_mtp.detect_devices.return_value = []
         self.test_model.transfer_media()
         self.mock_mtp.connect.assert_not_called()
 
-    def test_transfer_media_should_only_transfer_media_from_proper_directories(self, mock_path):
+    def test_transfer_media_should_only_transfer_media_from_proper_directories(self):
         self.test_model.transfer_media()
         self.mock_mtp.get_file_to_file.assert_called_once_with(33, ANY)
 
-    def test_transfer_media_should_transfer_media_to_staging_dir(self, mock_path):
+    @patch('os.path.splitext')
+    def test_transfer_media_should_only_transfer_recognized_media(self, mock_splitext):
+        mock_splitext.return_value = ('ignore', '.gif')
+        self.test_model.transfer_media()
+        self.mock_mtp.get_file_to_file.assert_not_called()
+
+    def test_transfer_media_should_transfer_media_to_staging_dir(self):
         self.test_model.transfer_media()
         self.mock_mtp.get_file_to_file.assert_called_once_with(ANY, '/haystack/staging/serial-number/IMG_1234.jpg')
 
-    def test_transfer_media_should_delete_media_after_transfer(self, mock_path):
-        mock_path.isfile.return_value = True
-        mock_path.getsize.return_value = 2048
+    @patch('os.path.getsize')
+    @patch('os.path.isfile')
+    def test_transfer_media_should_delete_media_after_transfer(self, mock_isfile, mock_getsize):
+        mock_isfile.return_value = True
+        mock_getsize.return_value = 2048
 
         self.test_model.transfer_media()
         self.mock_mtp.delete_object.assert_called_once_with(33)
 
-    def test_transfer_media_should_not_delete_media_if_it_didnt_transfer(self, mock_path):
-        mock_path.isfile.return_value = False
+    @patch('os.path.isfile')
+    def test_transfer_media_should_not_delete_media_if_it_didnt_transfer(self, mock_isfile):
+        mock_isfile.return_value = False
 
         self.test_model.transfer_media()
         self.mock_mtp.delete_object.assert_not_called()
 
-    def test_transfer_media_should_not_delete_media_if_it_didnt_transfer_completely(self, mock_path):
-        mock_path.getsize.return_value = 2047
+    @patch('os.path.getsize')
+    def test_transfer_media_should_not_delete_media_if_it_didnt_transfer_completely(self, mock_getsize):
+        mock_getsize.return_value = 2047
 
         self.test_model.transfer_media()
         self.mock_mtp.delete_object.assert_not_called()

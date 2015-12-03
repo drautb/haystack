@@ -4,6 +4,7 @@ import os
 import sys
 
 from config import Config
+from file import File
 from util import Util
 
 
@@ -111,6 +112,12 @@ class MTPDevice:
         return self.config.staging_directory(self.mtp.get_serialnumber())
 
     def __transfer_file(self, src_file, dest_dir):
+        try:
+            f = File(src_file.filename)
+        except RuntimeError:
+            logging.warn('Found unrecognized file in folders to index, skipping. filename=%s', src_file.filename)
+            return
+
         dest_file = '{}/{}'.format(dest_dir, src_file.filename)
         logging.info('Downloading file from device. file_id=%s filename=%s destination=%s',
                      src_file.item_id, src_file.filename, dest_file)
