@@ -31,6 +31,9 @@ class File:
     def is_video(self):
         return self.extension in VIDEO_EXTENSIONS
 
+    def filename(self):
+        return self.path_to_file
+
     def ext(self):
         return self.extension
 
