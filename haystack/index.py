@@ -1,6 +1,7 @@
 import logging
 import time
 
+from config import Config
 from firebase import firebase
 
 FIREBASE_URL_TEMPLATE = 'https://{0}.firebaseio.com'
