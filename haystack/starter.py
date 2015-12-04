@@ -9,7 +9,7 @@ from usb_device_manager import USBDeviceManager
 from usb_device import USBDevice
 from indexer import Indexer
 
-logging.basicConfig(stream=sys.stdout,
+logging.basicConfig(filename='/var/log/haystack/app.log',
                     level=logging.INFO,
                     format='%(asctime)s [%(levelname)s] - %(message)s',
                     datefmt='%Y/%m/%d %I:%M:%S%p')

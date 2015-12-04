@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-python haystack/starter.py
+daemon --user=pi --name=haystack -X "python haystack/starter.py"
