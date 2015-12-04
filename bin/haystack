@@ -1,38 +1,66 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-set -e
+NAME="haystack"
+SCRIPT="/usr/bin/python /home/pi/haystack/haystack/starter.py"
 
-# Must be a valid filename
-NAME=haystack
-PIDFILE=/var/run/$NAME.pid
+DAEMON_LOG="--errlog=/var/log/haystack/daemon.log"
+CLIENT_LOG="--output=/var/log/haystack/app.log"
 
-#This is the command to be run, give the full pathname
-DAEMON=/home/pi/haystack/bin/haystack
-DAEMON_OPTS=""
+# Get the location of the running location.
+DAEMON_CHDIR="--chdir=/home/pi/haystack"
+DAEMON_USER_GROUP="--user=pi:pi"
 
-export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+DAEMON_START_MSG="Starting Haystack"
+DAEMON_STOP_MSG="Stopping Haystack"
 
-case "$1" in
+DAEMON_CMD="daemon $DAEMON_USER_GROUP --name=$NAME"
+
+fail_unless_root() {
+  if [ "$(id -u)" != "0" ] ; then
+    log_failure_msg "$NAME must be run as root"
+    exit 1
+  fi
+}
+
+is_running() {
+  $DAEMON_CMD --running
+}
+
+start_daemon() {
+  is_running && return 0
+  $DAEMON_CMD $DAEMON_CHDIR --respawn --command="$SCRIPT" $DAEMON_LOG $CLIENT_LOG
+  sleep 1
+  is_running
+}
+
+stop_daemon() {
+  is_running || return 0
+  $DAEMON_CMD --stop
+}
+
+case $1 in
   start)
-        echo "Starting daemon: "$NAME
-    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
-        echo "."
+    echo "$DAEMON_START_MSG"
+    fail_unless_root
+    start_daemon
     ;;
   stop)
-        echo "Stopping daemon: "$NAME
-    start-stop-daemon --stop --quiet --oknodo --pidfile $PIDFILE
-        echo "."
+    echo "$DAEMON_STOP_MSG"
+    fail_unless_root
+    stop_daemon
     ;;
   restart)
-        echo "Restarting daemon: "$NAME
-    start-stop-daemon --stop --quiet --oknodo --retry 30 --pidfile $PIDFILE
-    start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
-    echo "."
+    fail_unless_root
+    stop_daemon
+    sleep 5
+    start_daemon
     ;;
-
+  status)
+    # Status of Daemon
+    is_running
+    ;;
   *)
-    echo "Usage: \"$1\" {start|stop|restart}"
+    echo "Usage: $0 (start|stop|restart|status)"
     exit 1
+    ;;
 esac
-
-exit 0
