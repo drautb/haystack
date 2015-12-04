@@ -7,6 +7,7 @@ from config import Config
 from mtp_device import MTPDevice
 from usb_device_manager import USBDeviceManager
 from usb_device import USBDevice
+from indexer import Indexer
 
 logging.basicConfig(stream=sys.stdout,
                     level=logging.INFO,
@@ -15,7 +16,8 @@ logging.basicConfig(stream=sys.stdout,
 
 
 class Starter:
-    def __init__(self, config=None, scheduler=None, mtp_device=None, usb_device_manager=None, usb_device=None):
+    def __init__(self, config=None, scheduler=None, mtp_device=None, usb_device_manager=None,
+                 usb_device=None, indexer=None):
         if config is None:
             config = Config()
 
@@ -31,11 +33,15 @@ class Starter:
         if usb_device is None:
             usb_device = USBDevice()
 
+        if indexer is None:
+            indexer = Indexer()
+
         self.config = config
         self.scheduler = scheduler
         self.mtp_device = mtp_device
         self.usb_device_manager = usb_device_manager
         self.usb_device = usb_device
+        self.indexer = indexer
 
     # Start function
     def start(self):
@@ -54,6 +60,8 @@ class Starter:
             self.usb_device.transfer_media(device_path, device_name)
 
         # Index staged media.
+        logging.info('Media transfer complete. Beginning indexing.')
+        self.indexer.run()
 
         # Schedule the next run of the indexer.
         logging.info('Indexer finished, scheduling next run.')

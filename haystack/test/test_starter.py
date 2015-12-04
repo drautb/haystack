@@ -5,6 +5,7 @@ import sched
 import unittest
 import usb_device
 import usb_device_manager
+import indexer
 
 from mock import ANY
 from mock import call
@@ -31,8 +32,10 @@ class TestStarter(unittest.TestCase):
 
         self.mock_usb_device = MagicMock(spec=usb_device.USBDevice)
 
+        self.mock_indexer = MagicMock(spec=indexer.Indexer)
+
         self.test_model = Starter(self.mock_config, self.mock_scheduler, self.mock_mtp_device,
-                                  self.mock_usb_device_manager, self.mock_usb_device)
+                                  self.mock_usb_device_manager, self.mock_usb_device, self.mock_indexer)
 
     def test_it_should_transfer_media_from_an_mtp_device(self):
         self.test_model.start()
@@ -50,6 +53,10 @@ class TestStarter(unittest.TestCase):
         self.test_model.start()
         calls = [call('/media/dev1', 'dev1'), call('/media/dev2', 'dev2')]
         self.mock_usb_device.transfer_media.assert_has_calls(calls)
+
+    def test_it_should_start_the_indexer(self):
+        self.test_model.start()
+        self.mock_indexer.run.assert_called_once_with()
 
     def test_it_should_use_the_config_value_to_schedule_jobs(self):
         self.test_model.start()
