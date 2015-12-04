@@ -45,5 +45,5 @@ class DateTakenExtractor:
 
     def __get_exif_tool(self):
         et = exiftool.ExifTool()
-        et.start
+        et.start()
         return et
