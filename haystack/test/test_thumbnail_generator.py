@@ -19,8 +19,6 @@ DEFAULT_THUMBNAIL_SIZE = 128
 class TestThumbnailGenerator(unittest.TestCase):
     def setUp(self):
         self.mock_image_file = MagicMock()
-        self.mock_thumbnail_file = MagicMock()
-        self.mock_image_file.thumbnail.return_value = self.mock_thumbnail_file
 
         self.mock_image = patch('thumbnail_generator.Image').start()
         self.mock_image.open.return_value = self.mock_image_file
@@ -53,7 +51,7 @@ class TestThumbnailGenerator(unittest.TestCase):
 
     def test_it_should_save_the_thumbnail_to_the_right_place(self):
         self.__run_img_test()
-        self.mock_thumbnail_file.save.assert_called_once_with(PATH_TO_IMG_THUMBNAIL)
+        self.mock_image_file.save.assert_called_once_with(PATH_TO_IMG_THUMBNAIL)
 
     def test_it_should_use_the_configured_thumbnail_size(self):
         self.mock_config.thumbnail_size.return_value = 196

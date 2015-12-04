@@ -31,8 +31,8 @@ class ThumbnailGenerator:
 
         if f.is_image():
             original_image = Image.open(path_to_file)
-            thumbnail_image = original_image.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
-            thumbnail_image.save(path_to_thumbnail)
+            original_image.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
+            original_image.save(path_to_thumbnail)
         # elif file_extension in VIDEO_EXTENSIONS:
         #     video = ffvideo.VideoStream(path_to_file)
         else:
