@@ -120,8 +120,8 @@ class Indexer:
             logging.info('Removing file=%s', path_to_file)
             os.remove(path_to_file)
         except Exception as e:
-            logging.error('Encountered error while trying to index file, leaving file in staging area. path_to_file=%s',
-                          path_to_file, e)
+            logging.exception('Encountered error while trying to index file, leaving file in staging area. ' +
+                              'path_to_file=%s', path_to_file)
 
     def __get_media_hash(self, path_to_file):
         md5 = hashlib.md5()

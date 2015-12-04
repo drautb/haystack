@@ -23,7 +23,7 @@ class VideoConverter:
         try:
             self.executor.execute(cmd_list)
         except CalledProcessError as e:
-            logging.error('An error occurred while converting this video. path_to_input=%s path_to_output=%s ' +
-                          'create_time=%s create_time_str=%s cmd=%s', path_to_input, path_to_output, create_time,
-                          create_time_str, SPACE.join(cmd_list))
+            logging.exception('An error occurred while converting this video. path_to_input=%s path_to_output=%s ' +
+                              'create_time=%s create_time_str=%s cmd=%s', path_to_input, path_to_output, create_time,
+                              create_time_str, SPACE.join(cmd_list))
             raise RuntimeError('An error occurred while converting a video to mp4!')

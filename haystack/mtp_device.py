@@ -34,9 +34,7 @@ class MTPDevice:
             self.mtp.connect()
             self.__log_connected_msg()
         except:
-            # https://wiki.python.org/moin/HandlingExceptions
-            e = sys.exc_info()[0]
-            logging.error('Error connecting to MTP device! Skipping MTP media transfer.', e)
+            logging.exception('Error connecting to MTP device! Skipping MTP media transfer.')
             return
 
         # Get the IDs for the parent folders to index.
