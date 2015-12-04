@@ -2,6 +2,7 @@ import ffvideo
 import logging
 import os
 
+from config import Config
 from file import File
 from PIL import Image
 

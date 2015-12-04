@@ -10,7 +10,9 @@ from datetime import datetime
 from file import File
 from index import Index
 from PIL import Image
+from thumbnail_generator import ThumbnailGenerator
 from time import strptime
+from util import Util
 
 BLOCK_SIZE_1M = 1048576  # 1024 Bytes * 1024 Bytes = 1M
 READ_ONLY_RAW = 'rb'
@@ -21,7 +23,7 @@ PATTERN_REPLACE_DAY = '%D'
 
 
 class Indexer:
-    def __init__(self, config=None, index=None, date_taken_extractor=None, thumbnail_generator=None):
+    def __init__(self, config=None, index=None, date_taken_extractor=None, thumbnail_generator=None, util=None):
         if config is None:
             config = Config()
 
@@ -34,10 +36,14 @@ class Indexer:
         if thumbnail_generator is None:
             thumbnail_generator = ThumbnailGenerator()
 
+        if util is None:
+            util = Util()
+
         self.config = config
         self.index = index
         self.date_taken_extractor = date_taken_extractor
         self.thumbnail_generator = thumbnail_generator
+        self.util = util
 
     def run(self):
         logging.info('Indexer started.')
@@ -45,6 +51,10 @@ class Indexer:
         # Locate the staging directory.
         staging_root = self.config.staging_root()
         logging.info('Located staging directory. staging_root=%s', staging_root)
+
+        # Make sure that the staging directory exists
+        if not os.path.isdir(staging_root):
+            self.util.mkdirp(staging_root)
 
         for staging_dir in self.__device_staging_dirs(staging_root):
             self.__index_files(staging_dir)

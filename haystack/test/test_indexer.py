@@ -11,6 +11,7 @@ from mock import Mock
 from mock import mock_open
 from mock import patch
 from thumbnail_generator import ThumbnailGenerator
+from util import Util
 
 
 def mock_listdir(*args):
@@ -23,7 +24,8 @@ def mock_listdir(*args):
 
 
 def mock_isdir(*args):
-    mapping = {('/staging/device-serial-1',): True}
+    mapping = {('/staging',): False,
+               ('/staging/device-serial-1',): True}
     if args in mapping:
         return mapping[args]
     else:
@@ -70,8 +72,10 @@ class TestIndexer(unittest.TestCase):
 
         self.mock_thumbnail_generator = Mock(spec=ThumbnailGenerator)
 
+        self.mock_util = Mock(spec=Util)
+
         self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_date_taken_extractor,
-                                  self.mock_thumbnail_generator)
+                                  self.mock_thumbnail_generator, self.mock_util)
 
     def tearDown(self):
         self.mock_listdir_patcher.stop()
@@ -79,6 +83,10 @@ class TestIndexer(unittest.TestCase):
         self.mock_copy_patcher.stop()
         self.mock_open_patcher.stop()
         self.mock_remove_patcher.stop()
+
+    def test_it_should_create_the_staging_root_if_it_doesnt_exist(self):
+        self.test_model.run()
+        self.mock_util.mkdirp.assert_called_once_with('/staging')
 
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail(self):
         expected_path_to_thumbnail = '/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'

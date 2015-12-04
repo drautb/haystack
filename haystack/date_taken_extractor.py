@@ -16,7 +16,7 @@ COLONS_IN_YMD = 2
 class DateTakenExtractor:
     def __init__(self, exif_tool=None):
         if exif_tool is None:
-            exif_tool = __get_exif_tool()
+            exif_tool = self.__get_exif_tool()
 
         self.exif_tool = exif_tool
 
