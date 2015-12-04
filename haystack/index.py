@@ -1,3 +1,4 @@
+import logging
 import time
 
 from firebase import firebase
@@ -31,6 +32,9 @@ class Index:
         self.fb_ref = firebase.FirebaseApplication(FIREBASE_URL_TEMPLATE.format(firebase_name), None)
 
     def index_media(self, path_to_media, path_to_thumbnail, taken, device_id, hash, type):
+        logging.info('Indexing media. path_to_media=%s path_to_thumbnail=%s taken=%d device_id=%s hash=%s type=%s',
+                     path_to_media, path_to_thumbnail, taken, device_id, hash, type)
+
         media_data = {
             PATH_TO_MEDIA: path_to_media,
             PATH_TO_THUMBNAIL: path_to_thumbnail,
