@@ -21,6 +21,11 @@ class USBDeviceManager:
 
     def __get_devices(self, mount_dir):
         devices = []
+
+        if not os.path.isdir(mount_dir):
+            logging.info('USB mount directory does not exist, skipping. mount_dir=%s', mount_dir)
+            return devices
+
         contents = os.listdir(mount_dir)
         for obj in contents:
             if os.path.isdir(os.path.join(mount_dir, obj)):
