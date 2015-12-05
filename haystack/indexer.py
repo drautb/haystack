@@ -109,6 +109,10 @@ class Indexer:
 
             # Copy file to final place.
             path_to_final_file = self.__generate_path_to_final_file(f, date_taken, file_hash)
+            final_directory = os.path.dirname(path_to_final_file)
+            if not os.path.isdir(final_directory):
+                self.util.mkdirp(final_directory)
+
             logging.info('Copying staged media to final location. path_to_staged_file=%s path_to_final_file=%s',
                          path_to_file, path_to_final_file)
             shutil.copy(path_to_file, path_to_final_file)

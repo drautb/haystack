@@ -13,6 +13,8 @@ from mock import patch
 from thumbnail_generator import ThumbnailGenerator
 from util import Util
 
+ISDIR_MAPPING = {}
+
 
 def mock_listdir(*args):
     mapping = {('/staging',): ['device-serial-1'],
@@ -24,10 +26,8 @@ def mock_listdir(*args):
 
 
 def mock_isdir(*args):
-    mapping = {('/staging',): False,
-               ('/staging/device-serial-1',): True}
-    if args in mapping:
-        return mapping[args]
+    if args in ISDIR_MAPPING:
+        return ISDIR_MAPPING[args]
     else:
         return False
 
@@ -37,7 +37,14 @@ def mock_staging_dir(*args):
 
 
 class TestIndexer(unittest.TestCase):
+    def __reset_isdir_mapping(self):
+        ISDIR_MAPPING[('/staging',)] = True
+        ISDIR_MAPPING[('/staging/device-serial-1',)] = True
+        ISDIR_MAPPING[('/pictures/2015/12/3',)] = True
+
     def setUp(self):
+        self.__reset_isdir_mapping()
+
         self.mock_listdir_patcher = patch('os.listdir')
         self.mock_listdir = self.mock_listdir_patcher.start()
         self.mock_listdir.side_effect = mock_listdir
@@ -85,6 +92,8 @@ class TestIndexer(unittest.TestCase):
         self.mock_remove_patcher.stop()
 
     def test_it_should_create_the_staging_root_if_it_doesnt_exist(self):
+        ISDIR_MAPPING[('/staging',)] = False
+
         self.test_model.run()
         self.mock_util.mkdirp.assert_called_once_with('/staging')
 
@@ -97,6 +106,12 @@ class TestIndexer(unittest.TestCase):
         expected_path_to_file = '/staging/device-serial-1/file.jpg'
         self.test_model.run()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(expected_path_to_file, ANY)
+
+    def test_it_should_make_sure_that_the_final_location_directory_exists(self):
+        ISDIR_MAPPING[('/pictures/2015/12/3',)] = False
+
+        self.test_model.run()
+        self.mock_util.mkdirp.assert_called_once_with('/pictures/2015/12/3')
 
     def test_it_should_copy_media_from_the_staging_location_to_the_final_location(self):
         self.test_model.run()
