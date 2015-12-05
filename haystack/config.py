@@ -87,7 +87,7 @@ class Config:
 
     def thumbnail_size(self):
         self.refresh_config()
-        return self.config.get(PATHS_TO_FILES_SECTION, THUMBNAIL_SIZE)
+        return self.config.getint(PATHS_TO_FILES_SECTION, THUMBNAIL_SIZE)
 
     def firebase_name(self):
         self.refresh_config()

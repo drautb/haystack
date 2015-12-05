@@ -21,10 +21,15 @@ def mock_config(*args):
             ('Index', 'Secret'): 'test-firebase-secret'}[args]
 
 
+def mock_config_getint(*args):
+    return {('PathsToFiles', 'ThumbnailSize'): 128}[args]
+
+
 class TestConfig(unittest.TestCase):
     def setUp(self):
         self.mock_config_parser = MagicMock(spec=ConfigParser)
         self.mock_config_parser.get.side_effect = mock_config
+        self.mock_config_parser.getint.side_effect = mock_config_getint
         self.test_model = Config(self.mock_config_parser)
 
     def test_it_should_load_the_right_config_file(self):
@@ -132,7 +137,7 @@ class TestConfig(unittest.TestCase):
 
     def test_thumbnail_size_should_return_the_right_directory(self):
         actual_value = self.test_model.thumbnail_size()
-        self.assertEqual(actual_value, '128')
+        self.assertEqual(actual_value, 128)
 
     def test_firebase_name_should_refresh_the_config(self):
         self.test_model.firebase_name()
