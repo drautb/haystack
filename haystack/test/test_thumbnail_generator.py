@@ -6,6 +6,7 @@ from mock import MagicMock
 from mock import patch
 from PIL import Image
 from thumbnail_generator import ThumbnailGenerator
+from util import Util
 
 PATH_TO_IMG_FILE = '/haystack/file.jpg'
 PATH_TO_IMG_THUMBNAIL = '/haystack/thumbs/file.jpg'
@@ -18,6 +19,10 @@ DEFAULT_THUMBNAIL_SIZE = 128
 
 class TestThumbnailGenerator(unittest.TestCase):
     def setUp(self):
+        self.mock_isdir_patcher = patch('os.path.isdir')
+        self.mock_isdir = self.mock_isdir_patcher.start()
+        self.mock_isdir.return_value = True
+
         self.mock_image_file = MagicMock()
 
         self.mock_image = patch('thumbnail_generator.Image').start()
@@ -30,7 +35,12 @@ class TestThumbnailGenerator(unittest.TestCase):
         self.mock_config = MagicMock(spec=Config)
         self.mock_config.thumbnail_size.return_value = DEFAULT_THUMBNAIL_SIZE
 
-        self.test_model = ThumbnailGenerator(self.mock_config)
+        self.mock_util = MagicMock(spec=Util)
+
+        self.test_model = ThumbnailGenerator(self.mock_config, self.mock_util)
+
+    def tearDown(self):
+        self.mock_isdir_patcher.stop()
 
     def __run_img_test(self):
         self.test_model.generate_thumbnail(PATH_TO_IMG_FILE, PATH_TO_IMG_THUMBNAIL)
@@ -48,6 +58,11 @@ class TestThumbnailGenerator(unittest.TestCase):
         self.__run_img_test()
         args, _ = self.mock_image_file.thumbnail.call_args
         self.assertTrue((DEFAULT_THUMBNAIL_SIZE, DEFAULT_THUMBNAIL_SIZE) in args)
+
+    def test_it_should_make_sure_that_the_thumbnail_directory_exists(self):
+        self.mock_isdir.return_value = False
+        self.__run_img_test()
+        self.mock_util.mkdirp.assert_called_once_with('/haystack/thumbs')
 
     def test_it_should_save_the_thumbnail_to_the_right_place(self):
         self.__run_img_test()

@@ -5,6 +5,7 @@ import os
 from config import Config
 from file import File
 from PIL import Image
+from util import Util
 
 
 class ThumbnailGenerator:
@@ -18,15 +19,22 @@ class ThumbnailGenerator:
     # frame = vs.get_frame_at_sec(0)
     # frame.image().save('thumb.jpg')
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, util=None):
         if config is None:
             config = Config()
 
+        if util is None:
+            util = Util()
+
         self.config = config
+        self.util = util
 
     def generate_thumbnail(self, path_to_file, path_to_thumbnail):
-        thumbnail_size = self.config.thumbnail_size()
+        thumbnail_dir = os.path.dirname(path_to_thumbnail)
+        if not os.path.isdir(thumbnail_dir):
+            self.util.mkdirp(thumbnail_dir)
 
+        thumbnail_size = self.config.thumbnail_size()
         f = File(path_to_file)
 
         if f.is_image():
