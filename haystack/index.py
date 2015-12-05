@@ -50,7 +50,7 @@ class Index:
             AUTH: self.config.firebase_secret()
         }
 
-        self.fb_ref.post(MEDIA_NODE, media_data, parameters)
+        self.fb_ref.post(MEDIA_NODE, media_data, params=parameters)
 
     def is_duplicate(self, hash_to_check):
         parameters = {

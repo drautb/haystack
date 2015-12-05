@@ -71,7 +71,7 @@ class TestIndex(unittest.TestCase):
             'auth': MOCK_AUTH_TOKEN
         }
 
-        self.mock_ref.post.assert_called_once_with('/media', expected_data, expected_params)
+        self.mock_ref.post.assert_called_once_with('/media', expected_data, params=expected_params)
 
     def test_it_should_use_the_right_values_when_checking_for_duplicates(self):
         self.__init_test()
