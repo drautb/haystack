@@ -13,7 +13,7 @@ DASH = '-'
 COLONS_IN_YMD = 2
 
 
-class DateTakenExtractor:
+class MetadataExtractor:
     def __init__(self, exif_tool=None):
         if exif_tool is None:
             exif_tool = self.__get_exif_tool()
@@ -36,6 +36,16 @@ class DateTakenExtractor:
         timestamp = mktime(dt_object.timetuple())
 
         return int(timestamp)
+
+    def get_rotation(self, path_to_file):
+        metadata = self.exif_tool.get_metadata(path_to_file)
+        f = File(path_to_file)
+
+        tag = f.rotation_tag()
+        if tag not in metadata:
+            return 0
+
+        return int(metadata[tag])
 
     def __check_tag(self, tag, metadata, path_to_file):
         if tag not in metadata:

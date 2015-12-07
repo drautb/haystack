@@ -1,7 +1,7 @@
 import unittest
 
 from config import Config
-from date_taken_extractor import DateTakenExtractor
+from metadata_extractor import MetadataExtractor
 from file import File
 from index import Index
 from indexer import Indexer
@@ -71,8 +71,8 @@ class TestIndexer(unittest.TestCase):
         self.mock_config.picture_path_pattern.return_value = '/pictures/%Y/%M/%D'
         self.mock_config.staging_directory.side_effect = mock_staging_dir
 
-        self.mock_date_taken_extractor = Mock(spec=DateTakenExtractor)
-        self.mock_date_taken_extractor.get_date_taken.return_value = 1449176000
+        self.mock_metadata_extractor = Mock(spec=MetadataExtractor)
+        self.mock_metadata_extractor.get_date_taken.return_value = 1449176000
 
         self.mock_index = Mock(spec=Index)
         self.mock_index.is_duplicate.return_value = False
@@ -81,7 +81,7 @@ class TestIndexer(unittest.TestCase):
 
         self.mock_util = Mock(spec=Util)
 
-        self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_date_taken_extractor,
+        self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_metadata_extractor,
                                   self.mock_thumbnail_generator, self.mock_util)
 
     def tearDown(self):

@@ -1,6 +1,6 @@
 import unittest
 
-from date_taken_extractor import DateTakenExtractor
+from metadata_extractor import MetadataExtractor
 from exiftool import ExifTool
 from mock import MagicMock
 
@@ -16,7 +16,7 @@ MISSING_DATE_JPG = '/path/to/broken/file.jpg'
 def mock_get_metadata(*args):
     mapping = {(TEST_FILE_MTS,): {'H264:DateTimeOriginal': '2015:11:16 20:00:00-05:00'},
                (TEST_FILE_MTS.replace('.mts', '.MTS'),): {'H264:DateTimeOriginal': '2015:11:16 20:00:00-05:00'},
-               (TEST_FILE_MP4,): {'QuickTime:CreateDate': '2015:10:13 00:26:44'},
+               (TEST_FILE_MP4,): {'QuickTime:CreateDate': '2015:10:13 00:26:44', 'Composite:Rotation': '90'},
                (TEST_FILE_JPG,): {'EXIF:DateTimeOriginal': '2015:06:23 21:52:13'},
                (MISSING_DATE_MTS,): {'FileType': 'H264'},
                (MISSING_DATE_MP4,): {'FileType': 'MP4'},
@@ -27,12 +27,12 @@ def mock_get_metadata(*args):
         return False
 
 
-class TestDateTakenExtractor(unittest.TestCase):
+class TestMetadataExtractor(unittest.TestCase):
     def setUp(self):
         self.mock_exif_tool = MagicMock(spec=ExifTool)
         self.mock_exif_tool.get_metadata = mock_get_metadata
 
-        self.test_model = DateTakenExtractor(self.mock_exif_tool)
+        self.test_model = MetadataExtractor(self.mock_exif_tool)
 
     def test_it_should_return_a_utc_timestamp_for_mts_files(self):
         time = self.test_model.get_date_taken(TEST_FILE_MTS)
@@ -65,6 +65,14 @@ class TestDateTakenExtractor(unittest.TestCase):
     def test_it_should_raise_a_runtime_error_if_the_extension_isnt_recognized(self):
         with self.assertRaises(RuntimeError):
             time = self.test_model.get_date_taken('bogus.txt')
+
+    def test_it_should_return_the_right_rotation_value_if_it_exists(self):
+        rotation = self.test_model.get_rotation(TEST_FILE_MP4)
+        self.assertEqual(rotation, 90)
+
+    def test_it_should_return_0_for_rotation_if_it_doesnt_exist(self):
+        rotation = self.test_model.get_rotation(TEST_FILE_MTS)
+        self.assertEqual(rotation, 0)
 
 
 if __name__ == '__main__':

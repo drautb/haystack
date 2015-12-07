@@ -5,7 +5,7 @@ import re
 import shutil
 
 from config import Config
-from date_taken_extractor import DateTakenExtractor
+from metadata_extractor import MetadataExtractor
 from datetime import datetime
 from file import File
 from index import Index
@@ -23,15 +23,15 @@ PATTERN_REPLACE_DAY = '%D'
 
 
 class Indexer:
-    def __init__(self, config=None, index=None, date_taken_extractor=None, thumbnail_generator=None, util=None):
+    def __init__(self, config=None, index=None, metadata_extractor=None, thumbnail_generator=None, util=None):
         if config is None:
             config = Config()
 
         if index is None:
             index = Index()
 
-        if date_taken_extractor is None:
-            date_taken_extractor = DateTakenExtractor()
+        if metadata_extractor is None:
+            metadata_extractor = MetadataExtractor()
 
         if thumbnail_generator is None:
             thumbnail_generator = ThumbnailGenerator()
@@ -41,7 +41,7 @@ class Indexer:
 
         self.config = config
         self.index = index
-        self.date_taken_extractor = date_taken_extractor
+        self.metadata_extractor = metadata_extractor
         self.thumbnail_generator = thumbnail_generator
         self.util = util
 
@@ -101,7 +101,7 @@ class Indexer:
             f = File(path_to_file)
 
             # Get the date the media was taken.
-            date_taken = self.date_taken_extractor.get_date_taken(path_to_file)
+            date_taken = self.metadata_extractor.get_date_taken(path_to_file)
 
             # Generate Thumbnail.
             path_to_thumbnail = self.__generate_path_to_thumbnail(f, date_taken, file_hash)
