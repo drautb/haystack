@@ -2,6 +2,7 @@ import mock
 import unittest
 
 from config import Config
+from metadata_extractor import MetadataExtractor
 from mock import ANY
 from mock import MagicMock
 from mock import patch
@@ -26,8 +27,9 @@ class TestThumbnailGenerator(unittest.TestCase):
 
         self.mock_image_file = MagicMock()
 
-        self.mock_image = patch('thumbnail_generator.Image').start()
-        self.mock_image.open.return_value = self.mock_image_file
+        self.mock_image_open_patcher = patch('thumbnail_generator.Image.open')
+        self.mock_image_open = self.mock_image_open_patcher.start()
+        self.mock_image_open.return_value = self.mock_image_file
 
         self.mock_ffvideo = patch('thumbnail_generator.ffvideo').start()
         self.mock_video_stream = MagicMock()
@@ -44,10 +46,14 @@ class TestThumbnailGenerator(unittest.TestCase):
 
         self.mock_util = MagicMock(spec=Util)
 
-        self.test_model = ThumbnailGenerator(self.mock_config, self.mock_util)
+        self.mock_metadata_extractor = MagicMock(spec=MetadataExtractor)
+        self.mock_metadata_extractor.get_rotation.return_value = 0
+
+        self.test_model = ThumbnailGenerator(self.mock_config, self.mock_util, self.mock_metadata_extractor)
 
     def tearDown(self):
         self.mock_isdir_patcher.stop()
+        self.mock_image_open_patcher.stop()
 
     def __run_img_test(self):
         self.test_model.generate_thumbnail(PATH_TO_IMG_FILE, PATH_TO_IMG_THUMBNAIL)
@@ -59,7 +65,7 @@ class TestThumbnailGenerator(unittest.TestCase):
 
     def test_it_should_open_the_right_file(self):
         self.__run_img_test()
-        self.mock_image.open.assert_called_once_with(PATH_TO_IMG_FILE)
+        self.mock_image_open.assert_called_once_with(PATH_TO_IMG_FILE)
 
     def test_it_should_create_a_thumbnail_with_the_configured_size(self):
         self.__run_img_test()
@@ -105,6 +111,30 @@ class TestThumbnailGenerator(unittest.TestCase):
         self.mock_video_stream.get_frame_at_sec.assert_called_once_with(0)
         self.mock_video_frame_img.save.assert_called_once_with(PATH_TO_VIDEO_THUMBNAIL)
 
+    def test_it_should_rotate_video_thumbnails_by_270_if_the_rotation_is_90(self):
+        self.mock_metadata_extractor.get_rotation.return_value = 90
+        self.__run_video_test()
+        self.mock_video_frame_img.transpose.assert_called_once_with(Image.ROTATE_270)
+
+    def test_it_should_rotate_video_thumbnails_by_180_if_the_rotation_is_180(self):
+        self.mock_metadata_extractor.get_rotation.return_value = 180
+        self.__run_video_test()
+        self.mock_video_frame_img.transpose.assert_called_once_with(Image.ROTATE_180)
+
+    def test_it_should_rotate_video_thumbnails_by_90_if_the_rotation_is_270(self):
+        self.mock_metadata_extractor.get_rotation.return_value = 270
+        self.__run_video_test()
+        self.mock_video_frame_img.transpose.assert_called_once_with(Image.ROTATE_90)
+
+    def test_it_should_not_rotate_video_thumbnails_if_the_rotation_is_0(self):
+        self.__run_video_test()
+        self.mock_video_frame_img.transpose.assert_not_called()
+
+    def test_it_should_raise_an_error_if_the_rotation_is_not_0_90_180_or_270(self):
+        with self.assertRaises(RuntimeError):
+            self.mock_metadata_extractor.get_rotation.return_value = 1
+            self.__run_video_test()
+
     def test_it_should_raise_an_error_for_non_media_files(self):
         with self.assertRaises(RuntimeError):
-            time = self.test_model.generate_thumbnail('bogus.txt', 'doesnt-matter.txt')
+            self.test_model.generate_thumbnail('bogus.txt', 'doesnt-matter.txt')

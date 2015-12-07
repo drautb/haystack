@@ -18,6 +18,8 @@ DATE_TAKEN_TAG = {
     '.jpeg': 'EXIF:DateTimeOriginal'
 }
 
+ROTATION_TAG = 'Composite:Rotation'
+
 
 class File:
     def __init__(self, path_to_file):
@@ -42,6 +44,9 @@ class File:
 
     def date_taken_tag(self):
         return DATE_TAKEN_TAG[self.extension]
+
+    def rotation_tag(self):
+        return ROTATION_TAG
 
     def __get_extension(self, path_to_file):
         _, extension = os.path.splitext(self.path_to_file)
