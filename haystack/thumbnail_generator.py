@@ -9,16 +9,6 @@ from util import Util
 
 
 class ThumbnailGenerator:
-
-    # from ffvideo import VideoStream
-
-    # vs = VideoStream('video.mp4',
-    #                  frame_size=(128, None),  # scale to width 128px
-    #                  frame_mode='RGB')
-
-    # frame = vs.get_frame_at_sec(0)
-    # frame.image().save('thumb.jpg')
-
     def __init__(self, config=None, util=None):
         if config is None:
             config = Config()
@@ -41,7 +31,9 @@ class ThumbnailGenerator:
             original_image = Image.open(path_to_file)
             original_image.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
             original_image.save(path_to_thumbnail)
-        # elif file_extension in VIDEO_EXTENSIONS:
-        #     video = ffvideo.VideoStream(path_to_file)
+        elif f.is_video():
+            video_stream = ffvideo.VideoStream(path_to_file, frame_size=(thumbnail_size, None), frame_mode='RGB')
+            video_thumbnail = video_stream.get_frame_at_sec(0).image()
+            video_thumbnail.save(path_to_thumbnail)
         else:
             raise RuntimeError('Unrecognized file extension!')

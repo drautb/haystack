@@ -2,6 +2,7 @@ import mock
 import unittest
 
 from config import Config
+from mock import ANY
 from mock import MagicMock
 from mock import patch
 from PIL import Image
@@ -31,6 +32,12 @@ class TestThumbnailGenerator(unittest.TestCase):
         self.mock_ffvideo = patch('thumbnail_generator.ffvideo').start()
         self.mock_video_stream = MagicMock()
         self.mock_ffvideo.VideoStream.return_value = self.mock_video_stream
+
+        self.mock_video_frame = MagicMock()
+        self.mock_video_stream.get_frame_at_sec.return_value = self.mock_video_frame
+
+        self.mock_video_frame_img = MagicMock()
+        self.mock_video_frame.image.return_value = self.mock_video_frame_img
 
         self.mock_config = MagicMock(spec=Config)
         self.mock_config.thumbnail_size.return_value = DEFAULT_THUMBNAIL_SIZE
@@ -75,11 +82,29 @@ class TestThumbnailGenerator(unittest.TestCase):
         args, _ = self.mock_image_file.thumbnail.call_args
         self.assertTrue((196, 196) in args)
 
-    def test_it_should_raise_an_error_for_non_image_files(self):
-        with self.assertRaises(RuntimeError):
-            time = self.test_model.generate_thumbnail('bogus.mp4', 'doesnt-matter.txt')
-
-    @unittest.skip('todo: thumbnails for video files')
     def test_it_should_open_the_right_file_for_videos(self):
         self.__run_video_test()
-        self.mock_ffvideo.VideoStream.assert_called_once_with(PATH_TO_VIDEO_FILE)
+        self.mock_ffvideo.VideoStream.assert_called_once_with(PATH_TO_VIDEO_FILE, frame_size=ANY, frame_mode=ANY)
+
+    def test_it_should_open_videos_with_the_right_frame_size(self):
+        self.__run_video_test()
+        self.mock_ffvideo.VideoStream.assert_called_once_with(ANY, frame_size=(128, None), frame_mode=ANY)
+
+    def test_it_should_open_videos_using_the_configured_thumbnail_size(self):
+        self.mock_config.thumbnail_size.return_value = 256
+
+        self.__run_video_test()
+        self.mock_ffvideo.VideoStream.assert_called_once_with(ANY, frame_size=(256, None), frame_mode=ANY)
+
+    def test_it_should_open_videos_with_the_right_frame_mode(self):
+        self.__run_video_test()
+        self.mock_ffvideo.VideoStream.assert_called_once_with(ANY, frame_size=ANY, frame_mode='RGB')
+
+    def test_it_should_save_the_first_frame_of_the_video_as_a_thumbnail(self):
+        self.__run_video_test()
+        self.mock_video_stream.get_frame_at_sec.assert_called_once_with(0)
+        self.mock_video_frame_img.save.assert_called_once_with(PATH_TO_VIDEO_THUMBNAIL)
+
+    def test_it_should_raise_an_error_for_non_media_files(self):
+        with self.assertRaises(RuntimeError):
+            time = self.test_model.generate_thumbnail('bogus.txt', 'doesnt-matter.txt')
