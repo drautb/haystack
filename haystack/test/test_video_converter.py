@@ -22,8 +22,8 @@ class TestVideoConverter(unittest.TestCase):
 
     def test_it_should_properly_form_the_shell_command(self):
         self.__run_test()
-        self.mock_executor.execute.assert_called_once_with(['ffmpeg', '-i', PATH_TO_INPUT, '-threads', '4', '-f', 'mp4',
-                                                            '-metadata', 'creation_time=2015-11-18 00:00:00',
+        self.mock_executor.execute.assert_called_once_with(['ffmpeg', '-i', PATH_TO_INPUT, '-threads', '16', '-f',
+                                                            'mp4', '-metadata', 'creation_time=2015-11-18 00:00:00',
                                                             PATH_TO_OUTPUT])
 
     def test_it_should_raise_an_error_if_the_conversion_failed(self):
