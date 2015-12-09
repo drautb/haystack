@@ -18,6 +18,7 @@ BLOCK_SIZE_1M = 1048576  # 1024 Bytes * 1024 Bytes = 1M
 READ_ONLY_RAW = 'rb'
 EMPTY = ''
 SLASH = '/'
+THUMBNAIL_EXT = '.jpg'
 
 PATTERN_REPLACE_YEAR = '%Y'
 PATTERN_REPLACE_MONTH = '%M'
@@ -84,7 +85,7 @@ class Indexer:
                 continue
 
             path_to_file = os.path.join(staging_dir, filename)
-            if File(path_to_file).is_image():
+            if File(path_to_file).is_image() or File(path_to_file).is_video():
                 self.__index_file(device_dir, path_to_file)
             else:
                 logging.info('File is not an image, not indexing. file=%s staging_dir=%s', path_to_file, staging_dir)
@@ -147,10 +148,16 @@ class Indexer:
 
     def __generate_path_to_thumbnail(self, f, date_taken, hash):
         path_to_thumbnail_pattern = self.config.thumbnail_path_pattern()
-        return self.__generate_path_to_file(path_to_thumbnail_pattern, f, date_taken, hash)
+        path = self.__generate_path_to_file(path_to_thumbnail_pattern, f, date_taken, hash)
+        return os.path.splitext(path)[0] + THUMBNAIL_EXT
 
     def __generate_path_to_final_file(self, f, date_taken, hash):
-        path_to_final_file_pattern = self.config.picture_path_pattern()
+        path_to_final_file_pattern = EMPTY
+        if f.is_image():
+            path_to_final_file_pattern = self.config.picture_path_pattern()
+        elif f.is_video():
+            path_to_final_file_pattern = self.config.video_path_pattern()
+
         return self.__generate_path_to_file(path_to_final_file_pattern, f, date_taken, hash)
 
     def __generate_path_to_file(self, pattern, f, date_in_seconds, file_hash):

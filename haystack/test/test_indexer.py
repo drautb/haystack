@@ -44,6 +44,7 @@ class TestIndexer(unittest.TestCase):
         ISDIR_MAPPING[('/root/staging',)] = True
         ISDIR_MAPPING[('/root/staging/device-serial-1',)] = True
         ISDIR_MAPPING[('/root/pictures/2015/12/3',)] = True
+        ISDIR_MAPPING[('/root/videos/2015/12/3',)] = True
 
     def setUp(self):
         self.__reset_listdir_mapping()
@@ -89,6 +90,14 @@ class TestIndexer(unittest.TestCase):
 
         self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_metadata_extractor,
                                   self.mock_thumbnail_generator, self.mock_util)
+
+    def __run_mp4_test(self):
+        LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.mp4']
+        self.test_model.run()
+
+    def __run_mts_test(self):
+        LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.mts']
+        self.test_model.run()
 
     def tearDown(self):
         self.mock_listdir_patcher.stop()
@@ -161,10 +170,60 @@ class TestIndexer(unittest.TestCase):
         self.test_model.run()
         self.mock_remove.assert_not_called()
 
-    def test_it_should_not_index_videos_yet(self):
-        self.test_model.run()
-        self.assertEqual(self.mock_open.call_count, 1)
+    def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail_for_mp4_videos(self):
+        expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        self.__run_mp4_test()
+        self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(ANY, expected_path_to_thumbnail)
 
+    def test_it_should_generate_a_thumbnail_using_the_expected_path_to_file_for_mp4_videos(self):
+        expected_path_to_file = '/root/staging/device-serial-1/file.mp4'
+        self.__run_mp4_test()
+        self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(expected_path_to_file, ANY)
+
+    @unittest.skip('todo')
+    def test_it_should_not_convert_mp4_videos(self):
+        return
+
+    def test_it_should_make_sure_that_the_final_location_directory_exists_for_mp4_videos(self):
+        ISDIR_MAPPING[('/root/videos/2015/12/3',)] = False
+
+        self.__run_mp4_test()
+        self.mock_util.mkdirp.assert_called_once_with('/root/videos/2015/12/3')
+
+    def test_it_should_copy_media_from_the_staging_location_to_the_final_location_for_mp4_videos(self):
+        self.__run_mp4_test()
+        self.mock_copy.assert_called_once_with('/root/staging/device-serial-1/file.mp4',
+                                               '/root/videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4')
+
+    def test_it_should_index_media_with_the_right_final_path_for_mp4_videos(self):
+        expected_path_to_file = 'videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4'
+        self.__run_mp4_test()
+        self.mock_index.index_media.assert_called_once_with(expected_path_to_file, ANY, ANY, ANY, ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_thumbnail_path_for_mp4_videos(self):
+        expected_path_to_thumbnail = 'thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        self.__run_mp4_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, expected_path_to_thumbnail, ANY, ANY, ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_date_taken_for_mp4_videos(self):
+        self.__run_mp4_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, 1449176000, ANY, ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_device_id_for_mp4_videos(self):
+        self.__run_mp4_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, 'device-serial-1', ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_hash_for_mp4_videos(self):
+        self.__run_mp4_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, '6c8abb37a65a74b526d456927a19549d', ANY)
+
+    def test_it_should_index_media_with_the_right_media_type_for_mp4_videos(self):
+        self.__run_mp4_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, ANY, 'MP4')
+
+    def test_it_should_delete_staged_media_after_indexing_for_mp4_videos(self):
+        self.__run_mp4_test()
+        self.mock_remove.assert_called_once_with('/root/staging/device-serial-1/file.mp4')
 
 if __name__ == '__main__':
     unittest.main()
