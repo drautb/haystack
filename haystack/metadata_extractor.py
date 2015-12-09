@@ -56,4 +56,8 @@ class MetadataExtractor:
     def __get_exif_tool(self):
         et = exiftool.ExifTool()
         et.start()
+
+        # Make sure that we kill the proc when we're done.
+        atexit.register(et.terminate)
+
         return et
