@@ -13,14 +13,13 @@ from mock import patch
 from thumbnail_generator import ThumbnailGenerator
 from util import Util
 
+LISTDIR_MAPPING = {}
 ISDIR_MAPPING = {}
 
 
 def mock_listdir(*args):
-    mapping = {('/staging',): ['device-serial-1'],
-               ('/staging/device-serial-1',): ['file.jpg', 'movie.mp4']}
-    if args in mapping:
-        return mapping[args]
+    if args in LISTDIR_MAPPING:
+        return LISTDIR_MAPPING[args]
     else:
         return False
 
@@ -33,16 +32,21 @@ def mock_isdir(*args):
 
 
 def mock_staging_dir(*args):
-    return '/staging/{0}'.format(args[0])
+    return '/root/staging/{0}'.format(args[0])
 
 
 class TestIndexer(unittest.TestCase):
+    def __reset_listdir_mapping(self):
+        LISTDIR_MAPPING[('/root/staging',)] = ['device-serial-1']
+        LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.jpg']
+
     def __reset_isdir_mapping(self):
-        ISDIR_MAPPING[('/staging',)] = True
-        ISDIR_MAPPING[('/staging/device-serial-1',)] = True
-        ISDIR_MAPPING[('/pictures/2015/12/3',)] = True
+        ISDIR_MAPPING[('/root/staging',)] = True
+        ISDIR_MAPPING[('/root/staging/device-serial-1',)] = True
+        ISDIR_MAPPING[('/root/pictures/2015/12/3',)] = True
 
     def setUp(self):
+        self.__reset_listdir_mapping()
         self.__reset_isdir_mapping()
 
         self.mock_listdir_patcher = patch('os.listdir')
@@ -66,9 +70,11 @@ class TestIndexer(unittest.TestCase):
         self.mock_remove = self.mock_remove_patcher.start()
 
         self.mock_config = Mock(spec=Config)
-        self.mock_config.staging_root.return_value = '/staging'
-        self.mock_config.thumbnail_path_pattern.return_value = '/thumbnails/%Y/%M/%D'
-        self.mock_config.picture_path_pattern.return_value = '/pictures/%Y/%M/%D'
+        self.mock_config.haystack_root.return_value = '/root'
+        self.mock_config.staging_root.return_value = '/root/staging'
+        self.mock_config.thumbnail_path_pattern.return_value = '/root/thumbnails/%Y/%M/%D'
+        self.mock_config.picture_path_pattern.return_value = '/root/pictures/%Y/%M/%D'
+        self.mock_config.video_path_pattern.return_value = '/root/videos/%Y/%M/%D'
         self.mock_config.staging_directory.side_effect = mock_staging_dir
 
         self.mock_metadata_extractor = Mock(spec=MetadataExtractor)
@@ -92,39 +98,41 @@ class TestIndexer(unittest.TestCase):
         self.mock_remove_patcher.stop()
 
     def test_it_should_create_the_staging_root_if_it_doesnt_exist(self):
-        ISDIR_MAPPING[('/staging',)] = False
+        ISDIR_MAPPING[('/root/staging',)] = False
 
         self.test_model.run()
-        self.mock_util.mkdirp.assert_called_once_with('/staging')
+        self.mock_util.mkdirp.assert_called_once_with('/root/staging')
 
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail(self):
-        expected_path_to_thumbnail = '/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.test_model.run()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(ANY, expected_path_to_thumbnail)
 
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_file(self):
-        expected_path_to_file = '/staging/device-serial-1/file.jpg'
+        expected_path_to_file = '/root/staging/device-serial-1/file.jpg'
         self.test_model.run()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(expected_path_to_file, ANY)
 
     def test_it_should_make_sure_that_the_final_location_directory_exists(self):
-        ISDIR_MAPPING[('/pictures/2015/12/3',)] = False
+        ISDIR_MAPPING[('/root/pictures/2015/12/3',)] = False
 
         self.test_model.run()
-        self.mock_util.mkdirp.assert_called_once_with('/pictures/2015/12/3')
+        self.mock_util.mkdirp.assert_called_once_with('/root/pictures/2015/12/3')
 
     def test_it_should_copy_media_from_the_staging_location_to_the_final_location(self):
         self.test_model.run()
-        self.mock_copy.assert_called_once_with('/staging/device-serial-1/file.jpg',
-                                               '/pictures/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg')
+        self.mock_copy.assert_called_once_with('/root/staging/device-serial-1/file.jpg',
+                                               '/root/pictures/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg')
 
+    # The indexed paths are relative to the root because that is where the file server will run from.
+    # It would be _bad_ to have a file server running at '/', instead of somewhere lower.
     def test_it_should_index_media_with_the_right_final_path(self):
-        expected_path_to_file = '/pictures/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        expected_path_to_file = 'pictures/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(expected_path_to_file, ANY, ANY, ANY, ANY, ANY)
 
     def test_it_should_index_media_with_the_right_thumbnail_path(self):
-        expected_path_to_thumbnail = '/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        expected_path_to_thumbnail = 'thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(ANY, expected_path_to_thumbnail, ANY, ANY, ANY, ANY)
 
@@ -146,7 +154,7 @@ class TestIndexer(unittest.TestCase):
 
     def test_it_should_delete_staged_media_after_indexing(self):
         self.test_model.run()
-        self.mock_remove.assert_called_once_with('/staging/device-serial-1/file.jpg')
+        self.mock_remove.assert_called_once_with('/root/staging/device-serial-1/file.jpg')
 
     def test_it_should_not_delete_staged_media_if_an_error_occurred_during_indexing(self):
         self.mock_index.index_media.side_effect = RuntimeError

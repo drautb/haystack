@@ -16,6 +16,8 @@ from util import Util
 
 BLOCK_SIZE_1M = 1048576  # 1024 Bytes * 1024 Bytes = 1M
 READ_ONLY_RAW = 'rb'
+EMPTY = ''
+SLASH = '/'
 
 PATTERN_REPLACE_YEAR = '%Y'
 PATTERN_REPLACE_MONTH = '%M'
@@ -117,8 +119,16 @@ class Indexer:
                          path_to_file, path_to_final_file)
             shutil.copy(path_to_file, path_to_final_file)
 
-            # Send data to index.
-            self.index.index_media(path_to_final_file, path_to_thumbnail, date_taken, device, file_hash, f.media_type())
+            # Send data to index. We strip off the root location so that all indexed paths are relative to the haystack
+            # root. This allows us to start the static file server in haystack root, rather than at the root of the
+            # file system.
+            haystack_root = self.config.haystack_root()
+            if not haystack_root.endswith(SLASH):
+                haystack_root += SLASH
+
+            self.index.index_media(path_to_final_file.replace(haystack_root, EMPTY, 1),
+                                   path_to_thumbnail.replace(haystack_root, EMPTY, 1),
+                                   date_taken, device, file_hash, f.media_type())
 
             # Remove file after successful indexing.
             logging.info('Removing file=%s', path_to_file)
