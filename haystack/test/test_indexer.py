@@ -12,6 +12,7 @@ from mock import mock_open
 from mock import patch
 from thumbnail_generator import ThumbnailGenerator
 from util import Util
+from video_converter import VideoConverter
 
 LISTDIR_MAPPING = {}
 ISDIR_MAPPING = {}
@@ -88,8 +89,10 @@ class TestIndexer(unittest.TestCase):
 
         self.mock_util = Mock(spec=Util)
 
+        self.mock_video_converter = MagicMock(spec=VideoConverter)
+
         self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_metadata_extractor,
-                                  self.mock_thumbnail_generator, self.mock_util)
+                                  self.mock_thumbnail_generator, self.mock_util, self.mock_video_converter)
 
     def __run_mp4_test(self):
         LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.mp4']
@@ -180,9 +183,9 @@ class TestIndexer(unittest.TestCase):
         self.__run_mp4_test()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(expected_path_to_file, ANY)
 
-    @unittest.skip('todo')
     def test_it_should_not_convert_mp4_videos(self):
-        return
+        self.__run_mp4_test()
+        self.mock_video_converter.convert_to_mp4.assert_not_called()
 
     def test_it_should_make_sure_that_the_final_location_directory_exists_for_mp4_videos(self):
         ISDIR_MAPPING[('/root/videos/2015/12/3',)] = False
@@ -224,6 +227,71 @@ class TestIndexer(unittest.TestCase):
     def test_it_should_delete_staged_media_after_indexing_for_mp4_videos(self):
         self.__run_mp4_test()
         self.mock_remove.assert_called_once_with('/root/staging/device-serial-1/file.mp4')
+
+    def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail_for_mts_videos(self):
+        expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        self.__run_mp4_test()
+        self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(ANY, expected_path_to_thumbnail)
+
+    def test_it_should_generate_a_thumbnail_using_the_expected_path_to_file_for_mts_videos(self):
+        expected_path_to_file = '/root/staging/device-serial-1/file.mts'
+        self.__run_mts_test()
+        self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(expected_path_to_file, ANY)
+
+    def test_it_should_convert_mts_videos_to_mp4_using_the_right_source_file(self):
+        self.__run_mts_test()
+        self.mock_video_converter.convert_to_mp4.assert_called_once_with('/root/staging/device-serial-1/file.mts',
+                                                                         ANY, ANY)
+
+    def test_it_should_convert_mts_videos_to_mp4_using_the_right_dest_file(self):
+        self.__run_mts_test()
+        (self.mock_video_converter.convert_to_mp4
+            .assert_called_once_with(ANY, '/root/videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4', ANY))
+
+    def test_it_should_convert_mts_videos_to_mp4_using_the_right_create_time(self):
+        self.__run_mts_test()
+        self.mock_video_converter.convert_to_mp4.assert_called_once_with(ANY, ANY, 1449176000)
+
+    def test_it_should_make_sure_that_the_final_location_directory_exists_for_mts_videos(self):
+        ISDIR_MAPPING[('/root/videos/2015/12/3',)] = False
+
+        self.__run_mts_test()
+        self.mock_util.mkdirp.assert_called_once_with('/root/videos/2015/12/3')
+
+    # We don't have to copy it because the conversion placed it there already.
+    def test_it_should_not_copy_media_from_the_staging_location_to_the_final_location_for_mts_videos(self):
+        self.__run_mts_test()
+        self.mock_copy.assert_not_called()
+
+    def test_it_should_index_media_with_the_right_final_path_for_mts_videos(self):
+        expected_path_to_file = 'videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4'
+        self.__run_mts_test()
+        self.mock_index.index_media.assert_called_once_with(expected_path_to_file, ANY, ANY, ANY, ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_thumbnail_path_for_mts_videos(self):
+        expected_path_to_thumbnail = 'thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
+        self.__run_mts_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, expected_path_to_thumbnail, ANY, ANY, ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_date_taken_for_mts_videos(self):
+        self.__run_mts_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, 1449176000, ANY, ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_device_id_for_mts_videos(self):
+        self.__run_mts_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, 'device-serial-1', ANY, ANY)
+
+    def test_it_should_index_media_with_the_right_hash_for_mts_videos(self):
+        self.__run_mts_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, '6c8abb37a65a74b526d456927a19549d', ANY)
+
+    def test_it_should_index_converted_mts_videos_as_mp4(self):
+        self.__run_mts_test()
+        self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, ANY, 'MP4')
+
+    def test_it_should_delete_staged_media_after_indexing_for_mts_videos(self):
+        self.__run_mts_test()
+        self.mock_remove.assert_called_once_with('/root/staging/device-serial-1/file.mts')
 
 if __name__ == '__main__':
     unittest.main()
