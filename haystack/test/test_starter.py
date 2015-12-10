@@ -58,6 +58,10 @@ class TestStarter(unittest.TestCase):
         self.test_model.start()
         self.mock_indexer.run.assert_called_once_with()
 
+    def test_it_should_catch_errors_in_the_indexer(self):
+        self.mock_indexer.run.side_effect = RuntimeError
+        self.test_model.start()
+
     def test_it_should_use_the_config_value_to_schedule_jobs(self):
         self.test_model.start()
         self.mock_scheduler.enter.assert_called_once_with(999, ANY, ANY, argument=ANY)

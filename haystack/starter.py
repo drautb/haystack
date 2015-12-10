@@ -61,7 +61,10 @@ class Starter:
 
         # Index staged media.
         logging.info('Media transfer complete. Beginning indexing.')
-        self.indexer.run()
+        try:
+            self.indexer.run()
+        except:
+            logging.exception('An error occurred while running the indexer.')
 
         # Schedule the next run of the indexer.
         logging.info('Indexer finished, scheduling next run.')
