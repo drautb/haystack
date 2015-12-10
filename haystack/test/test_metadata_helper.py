@@ -96,7 +96,8 @@ class TestMetadataHelper(unittest.TestCase):
 
     def test_it_should_correctly_set_rotation_on_image_files(self):
         self.test_model.set_rotation(TEST_FILE_JPG, 3)
-        self.mock_exiftool_instance.execute.assert_called_once_with('-EXIF:Orientation=3', TEST_FILE_JPG)
+        self.mock_exiftool_instance.execute.assert_called_once_with('-EXIF:Orientation=3', '-overwrite_original',
+                                                                    TEST_FILE_JPG)
 
 if __name__ == '__main__':
     unittest.main()
