@@ -19,6 +19,7 @@ class Preprocessor:
             return
 
         image = Image.open(path_to_file)
+        exif_data = image.info['exif']
         rotation = self.metadata_helper.get_rotation(path_to_file)
 
         logging.info('Preprocessing file. path_to_file=%s rotation=%d', path_to_file, rotation)
@@ -40,7 +41,7 @@ class Preprocessor:
         elif rotation == 8:
             image = image.transpose(Image.ROTATE_270)
 
-        image.save(path_to_file)
+        image.save(path_to_file, exif=exif_data)
 
         logging.info('File has been processed, setting orientation to 1. path_to_file=%s', path_to_file)
         self.metadata_helper.set_rotation(path_to_file, 1)
