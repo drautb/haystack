@@ -5,11 +5,12 @@ import re
 import shutil
 
 from config import Config
-from metadata_extractor import MetadataExtractor
 from datetime import datetime
 from file import File
 from index import Index
+from metadata_helper import MetadataHelper
 from PIL import Image
+from preprocessor import Preprocessor
 from thumbnail_generator import ThumbnailGenerator
 from time import strptime
 from util import Util
@@ -29,16 +30,16 @@ PATTERN_REPLACE_DAY = '%D'
 
 
 class Indexer:
-    def __init__(self, config=None, index=None, metadata_extractor=None,
-                 thumbnail_generator=None, util=None, video_converter=None):
+    def __init__(self, config=None, index=None, metadata_helper=None, thumbnail_generator=None, util=None,
+                 video_converter=None, preprocessor=None):
         if config is None:
             config = Config()
 
         if index is None:
             index = Index()
 
-        if metadata_extractor is None:
-            metadata_extractor = MetadataExtractor()
+        if metadata_helper is None:
+            metadata_helper = MetadataHelper()
 
         if thumbnail_generator is None:
             thumbnail_generator = ThumbnailGenerator()
@@ -49,12 +50,16 @@ class Indexer:
         if video_converter is None:
             video_converter = VideoConverter()
 
+        if preprocessor is None:
+            preprocessor = Preprocessor()
+
         self.config = config
         self.index = index
-        self.metadata_extractor = metadata_extractor
+        self.metadata_helper = metadata_helper
         self.thumbnail_generator = thumbnail_generator
         self.util = util
         self.video_converter = video_converter
+        self.preprocessor = preprocessor
 
     def run(self):
         logging.info('Indexer started.')
@@ -101,8 +106,11 @@ class Indexer:
 
     def __index_file(self, device, path_to_file):
         logging.info('Indexing file=%s', path_to_file)
-        file_hash = self.__get_media_hash(path_to_file)
 
+        # Preprocess files. (Rotate images properly)
+        self.preprocessor.preprocess(path_to_file)
+
+        file_hash = self.__get_media_hash(path_to_file)
         if self.index.is_duplicate(file_hash):
             logging.info('File hash already appears in index, file appears to be a duplicate, and will be deleted. ' +
                          'path_to_file=%s file_hash=%s', path_to_file, file_hash)
@@ -113,7 +121,7 @@ class Indexer:
             f = File(path_to_file)
 
             # Get the date the media was taken.
-            date_taken = self.metadata_extractor.get_date_taken(path_to_file)
+            date_taken = self.metadata_helper.get_date_taken(path_to_file)
 
             # Generate Thumbnail.
             path_to_thumbnail = self.__generate_path_to_thumbnail(f, date_taken, file_hash)

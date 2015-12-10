@@ -2,7 +2,7 @@ import mock
 import unittest
 
 from config import Config
-from metadata_extractor import MetadataExtractor
+from metadata_helper import MetadataHelper
 from mock import ANY
 from mock import MagicMock
 from mock import patch
@@ -46,10 +46,10 @@ class TestThumbnailGenerator(unittest.TestCase):
 
         self.mock_util = MagicMock(spec=Util)
 
-        self.mock_metadata_extractor = MagicMock(spec=MetadataExtractor)
-        self.mock_metadata_extractor.get_rotation.return_value = 0
+        self.mock_metadata_helper = MagicMock(spec=MetadataHelper)
+        self.mock_metadata_helper.get_rotation.return_value = 0
 
-        self.test_model = ThumbnailGenerator(self.mock_config, self.mock_util, self.mock_metadata_extractor)
+        self.test_model = ThumbnailGenerator(self.mock_config, self.mock_util, self.mock_metadata_helper)
 
     def tearDown(self):
         self.mock_isdir_patcher.stop()
@@ -112,17 +112,17 @@ class TestThumbnailGenerator(unittest.TestCase):
         self.mock_video_frame_img.save.assert_called_once_with(PATH_TO_VIDEO_THUMBNAIL)
 
     def test_it_should_rotate_video_thumbnails_by_270_if_the_rotation_is_90(self):
-        self.mock_metadata_extractor.get_rotation.return_value = 90
+        self.mock_metadata_helper.get_rotation.return_value = 90
         self.__run_video_test()
         self.mock_video_frame_img.transpose.assert_called_once_with(Image.ROTATE_270)
 
     def test_it_should_rotate_video_thumbnails_by_180_if_the_rotation_is_180(self):
-        self.mock_metadata_extractor.get_rotation.return_value = 180
+        self.mock_metadata_helper.get_rotation.return_value = 180
         self.__run_video_test()
         self.mock_video_frame_img.transpose.assert_called_once_with(Image.ROTATE_180)
 
     def test_it_should_rotate_video_thumbnails_by_90_if_the_rotation_is_270(self):
-        self.mock_metadata_extractor.get_rotation.return_value = 270
+        self.mock_metadata_helper.get_rotation.return_value = 270
         self.__run_video_test()
         self.mock_video_frame_img.transpose.assert_called_once_with(Image.ROTATE_90)
 
@@ -132,7 +132,7 @@ class TestThumbnailGenerator(unittest.TestCase):
 
     def test_it_should_raise_an_error_if_the_rotation_is_not_0_90_180_or_270(self):
         with self.assertRaises(RuntimeError):
-            self.mock_metadata_extractor.get_rotation.return_value = 1
+            self.mock_metadata_helper.get_rotation.return_value = 1
             self.__run_video_test()
 
     def test_it_should_raise_an_error_for_non_media_files(self):

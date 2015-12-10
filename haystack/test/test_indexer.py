@@ -1,15 +1,16 @@
 import unittest
 
 from config import Config
-from metadata_extractor import MetadataExtractor
 from file import File
 from index import Index
 from indexer import Indexer
+from metadata_helper import MetadataHelper
 from mock import ANY
 from mock import MagicMock
 from mock import Mock
 from mock import mock_open
 from mock import patch
+from preprocessor import Preprocessor
 from thumbnail_generator import ThumbnailGenerator
 from util import Util
 from video_converter import VideoConverter
@@ -79,8 +80,8 @@ class TestIndexer(unittest.TestCase):
         self.mock_config.video_path_pattern.return_value = '/root/videos/%Y/%M/%D'
         self.mock_config.staging_directory.side_effect = mock_staging_dir
 
-        self.mock_metadata_extractor = Mock(spec=MetadataExtractor)
-        self.mock_metadata_extractor.get_date_taken.return_value = 1449176000
+        self.mock_metadata_helper = Mock(spec=MetadataHelper)
+        self.mock_metadata_helper.get_date_taken.return_value = 1449176000
 
         self.mock_index = Mock(spec=Index)
         self.mock_index.is_duplicate.return_value = False
@@ -91,8 +92,11 @@ class TestIndexer(unittest.TestCase):
 
         self.mock_video_converter = MagicMock(spec=VideoConverter)
 
-        self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_metadata_extractor,
-                                  self.mock_thumbnail_generator, self.mock_util, self.mock_video_converter)
+        self.mock_preprocessor = MagicMock(spec=Preprocessor)
+
+        self.test_model = Indexer(self.mock_config, self.mock_index, self.mock_metadata_helper,
+                                  self.mock_thumbnail_generator, self.mock_util, self.mock_video_converter,
+                                  self.mock_preprocessor)
 
     def __run_mp4_test(self):
         LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.mp4']
@@ -114,6 +118,10 @@ class TestIndexer(unittest.TestCase):
 
         self.test_model.run()
         self.mock_util.mkdirp.assert_called_once_with('/root/staging')
+
+    def test_it_should_preprocess_the_file(self):
+        self.test_model.run()
+        self.mock_preprocessor.preprocess.assert_called_once_with('/root/staging/device-serial-1/file.jpg')
 
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail(self):
         expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'

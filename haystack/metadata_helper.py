@@ -14,7 +14,7 @@ DASH = '-'
 COLONS_IN_YMD = 2
 
 
-class MetadataExtractor:
+class MetadataHelper:
 
     # Given a file, this function returns a UNIX timestamp (seconds)
     # in UTC that describes when the picture/video was taken.
@@ -48,6 +48,11 @@ class MetadataExtractor:
             return 0
 
         return int(metadata[tag])
+
+    def set_rotation(self, path_to_file, new_rotation):
+        f = File(path_to_file)
+        with exiftool.ExifTool() as et:
+            et.execute('-' + f.rotation_tag() + '=' + str(new_rotation), path_to_file)
 
     def __check_tag(self, tag, metadata, path_to_file):
         if tag not in metadata:

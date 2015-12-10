@@ -18,7 +18,12 @@ DATE_TAKEN_TAG = {
     '.jpeg': 'EXIF:DateTimeOriginal'
 }
 
-ROTATION_TAG = 'Composite:Rotation'
+ROTATION_TAG = {
+    '.mts': 'Composite:Rotation',
+    '.mp4': 'Composite:Rotation',
+    '.jpg': 'EXIF:Orientation',
+    '.jpeg': 'EXIF:Orientation'
+}
 
 
 class File:
@@ -46,7 +51,7 @@ class File:
         return DATE_TAKEN_TAG[self.extension]
 
     def rotation_tag(self):
-        return ROTATION_TAG
+        return ROTATION_TAG[self.extension]
 
     def __get_extension(self, path_to_file):
         _, extension = os.path.splitext(self.path_to_file)

@@ -19,7 +19,7 @@ class TestFile(unittest.TestCase):
         self.assertEqual(test_file.ext(), '.jpg')
         self.assertEqual(test_file.media_type(), 'JPG')
         self.assertEqual(test_file.date_taken_tag(), 'EXIF:DateTimeOriginal')
-        self.assertEqual(test_file.rotation_tag(), 'Composite:Rotation')
+        self.assertEqual(test_file.rotation_tag(), 'EXIF:Orientation')
 
     def test_it_should_tell_the_truth_about_JPG_files(self):
         test_file = File('/path/to/file.JPG')
@@ -29,7 +29,7 @@ class TestFile(unittest.TestCase):
         self.assertEqual(test_file.ext(), '.jpg')
         self.assertEqual(test_file.media_type(), 'JPG')
         self.assertEqual(test_file.date_taken_tag(), 'EXIF:DateTimeOriginal')
-        self.assertEqual(test_file.rotation_tag(), 'Composite:Rotation')
+        self.assertEqual(test_file.rotation_tag(), 'EXIF:Orientation')
 
     def test_it_should_tell_the_truth_about_jpeg_files(self):
         test_file = File('/path/to/file.jpeg')
@@ -39,7 +39,7 @@ class TestFile(unittest.TestCase):
         self.assertEqual(test_file.ext(), '.jpeg')
         self.assertEqual(test_file.media_type(), 'JPEG')
         self.assertEqual(test_file.date_taken_tag(), 'EXIF:DateTimeOriginal')
-        self.assertEqual(test_file.rotation_tag(), 'Composite:Rotation')
+        self.assertEqual(test_file.rotation_tag(), 'EXIF:Orientation')
 
     def test_it_should_tell_the_truth_about_JPEG_files(self):
         test_file = File('/path/to/file.JPEG')
@@ -49,7 +49,7 @@ class TestFile(unittest.TestCase):
         self.assertEqual(test_file.ext(), '.jpeg')
         self.assertEqual(test_file.media_type(), 'JPEG')
         self.assertEqual(test_file.date_taken_tag(), 'EXIF:DateTimeOriginal')
-        self.assertEqual(test_file.rotation_tag(), 'Composite:Rotation')
+        self.assertEqual(test_file.rotation_tag(), 'EXIF:Orientation')
 
     def test_it_should_tell_the_truth_about_mp4_files(self):
         test_file = File('/path/to/file.mp4')
