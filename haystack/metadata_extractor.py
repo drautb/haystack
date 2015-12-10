@@ -15,16 +15,14 @@ COLONS_IN_YMD = 2
 
 
 class MetadataExtractor:
-    def __init__(self, exif_tool=None):
-        if exif_tool is None:
-            exif_tool = self.__get_exif_tool()
-
-        self.exif_tool = exif_tool
 
     # Given a file, this function returns a UNIX timestamp (seconds)
     # in UTC that describes when the picture/video was taken.
     def get_date_taken(self, path_to_file):
-        metadata = self.exif_tool.get_metadata(path_to_file)
+        metadata = {}
+        with exiftool.ExifTool() as et:
+            metadata = et.get_metadata(path_to_file)
+
         f = File(path_to_file)
 
         tag = f.date_taken_tag()
@@ -39,7 +37,10 @@ class MetadataExtractor:
         return int(timestamp)
 
     def get_rotation(self, path_to_file):
-        metadata = self.exif_tool.get_metadata(path_to_file)
+        metadata = {}
+        with exiftool.ExifTool() as et:
+            metadata = et.get_metadata(path_to_file)
+
         f = File(path_to_file)
 
         tag = f.rotation_tag()
@@ -53,12 +54,3 @@ class MetadataExtractor:
             logging.error('This file\'s metadata doesn\'t contain the expected tag. path_to_file=%s tag=%s',
                           path_to_file, tag)
             raise RuntimeError('This file does not have the expected metedata tag!')
-
-    def __get_exif_tool(self):
-        et = exiftool.ExifTool()
-        et.start()
-
-        # Make sure that we kill the proc when we're done.
-        atexit.register(et.terminate)
-
-        return et

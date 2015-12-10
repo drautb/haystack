@@ -1,8 +1,9 @@
 import unittest
 
-from metadata_extractor import MetadataExtractor
 from exiftool import ExifTool
+from metadata_extractor import MetadataExtractor
 from mock import MagicMock
+from mock import patch
 
 TEST_FILE_MTS = '/path/to/file.mts'
 TEST_FILE_MP4 = '/path/to/file.mp4'
@@ -29,10 +30,21 @@ def mock_get_metadata(*args):
 
 class TestMetadataExtractor(unittest.TestCase):
     def setUp(self):
-        self.mock_exif_tool = MagicMock(spec=ExifTool)
-        self.mock_exif_tool.get_metadata = mock_get_metadata
+        self.mock_exiftool_patcher = patch('metadata_extractor.exiftool')
+        self.mock_exiftool = self.mock_exiftool_patcher.start()
 
-        self.test_model = MetadataExtractor(self.mock_exif_tool)
+        self.mock_exiftool_instance = MagicMock(spec=ExifTool)
+        self.mock_exiftool.ExifTool.return_value = self.mock_exiftool_instance
+
+        self.get_metadata_mock = MagicMock()
+        self.get_metadata_mock.get_metadata = mock_get_metadata
+
+        self.mock_exiftool_instance.__enter__.return_value = self.get_metadata_mock
+
+        self.test_model = MetadataExtractor()
+
+    def tearDown(self):
+        self.mock_exiftool_patcher.stop()
 
     def test_it_should_return_a_utc_timestamp_for_mts_files(self):
         time = self.test_model.get_date_taken(TEST_FILE_MTS)
