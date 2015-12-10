@@ -1,3 +1,4 @@
+import atexit
 import exiftool
 import logging
 import os
