@@ -24,21 +24,21 @@ class Preprocessor:
         logging.info('Preprocessing file. path_to_file=%s rotation=%d', path_to_file, rotation)
 
         if rotation == 2:
-            image.transpose(Image.FLIP_LEFT_RIGHT)
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
         elif rotation == 3:
-            image.transpose(Image.ROTATE_180)
+            image = image.transpose(Image.ROTATE_180)
         elif rotation == 4:
-            image.transpose(Image.FLIP_TOP_BOTTOM)
+            image = image.transpose(Image.FLIP_TOP_BOTTOM)
         elif rotation == 5:
-            image.transpose(Image.ROTATE_90)
-            image.transpose(Image.FLIP_LEFT_RIGHT)
+            image = image.transpose(Image.ROTATE_90)
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
         elif rotation == 6:
-            image.transpose(Image.ROTATE_90)
+            image = image.transpose(Image.ROTATE_90)
         elif rotation == 7:
-            image.transpose(Image.FLIP_LEFT_RIGHT)
-            image.transpose(Image.ROTATE_90)
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
+            image = image.transpose(Image.ROTATE_90)
         elif rotation == 8:
-            image.transpose(Image.ROTATE_270)
+            image = image.transpose(Image.ROTATE_270)
 
         image.save(path_to_file)
 
