@@ -41,4 +41,6 @@ class Preprocessor:
             image.transpose(Image.ROTATE_270)
 
         image.save(path_to_file)
+
+        logging.info('File has been processed, setting orientation to 1. path_to_file=%s', path_to_file)
         self.metadata_helper.set_rotation(path_to_file, 1)
