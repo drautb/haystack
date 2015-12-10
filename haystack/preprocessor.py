@@ -4,6 +4,8 @@ from file import File
 from metadata_helper import MetadataHelper
 from PIL import Image
 
+EXIF_KEY = 'exif'
+
 
 class Preprocessor:
     def __init__(self, metadata_helper=None):
@@ -19,6 +21,10 @@ class Preprocessor:
             return
 
         image = Image.open(path_to_file)
+        if EXIF_KEY not in image.info:
+            logging.warn('Image does not have EXIF information, skipping preprocessing. path_to_file=%s', path_to_file)
+            return
+
         exif_data = image.info['exif']
         rotation = self.metadata_helper.get_rotation(path_to_file)
 

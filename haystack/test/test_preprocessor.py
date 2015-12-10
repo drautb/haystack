@@ -106,6 +106,11 @@ class TestPreprocessor(unittest.TestCase):
         self.test_model.preprocess('/root/staging/USB/image.jpg')
         self.mock_metadata_helper.set_rotation.assert_called_once_with('/root/staging/USB/image.jpg', 1)
 
+    def test_it_should_not_do_anything_if_the_image_is_missing_exif_data(self):
+        self.mock_image.info = {}
+        self.test_model.preprocess('/root/staging/USB/image.jpg')
+        self.mock_metadata_helper.get_rotation.assert_not_called()
+
 
 if __name__ == '__main__':
     unittest.main()
