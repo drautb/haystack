@@ -98,10 +98,10 @@ class Indexer:
                 continue
 
             path_to_file = os.path.join(staging_dir, filename)
-            if File(path_to_file).is_image():
+            if File(path_to_file).is_image() or File(path_to_file).is_video():
                 self.__index_file(device_dir, path_to_file)
             else:
-                logging.info('File is not an image, not indexing. file=%s staging_dir=%s',
+                logging.info('File is not an image or video, not indexing. file=%s staging_dir=%s',
                              path_to_file, staging_dir)
 
     def __index_file(self, device, path_to_file):
