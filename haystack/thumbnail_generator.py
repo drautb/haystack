@@ -43,7 +43,7 @@ class ThumbnailGenerator:
             original_image.save(path_to_thumbnail)
         elif f.is_video():
             ffmpeg_cmd = ['ffmpeg', '-i', path_to_file, '-vframes', '1', '-ss', '0', '-vf',
-                          'scale="\'if(gte(iw,ih),' + str(thumbnail_size) + ',-1)\':\'if(lte(ih,iw),-1,' +
+                          'scale="\'if(gte(iw,ih),' + str(thumbnail_size) + ',-1)\':\'if(gte(iw,ih),-1,' +
                           str(thumbnail_size) + ')\'"', path_to_thumbnail]
             self.executor.execute(ffmpeg_cmd)
         else:
