@@ -3,6 +3,7 @@ import logging
 import os
 
 from config import Config
+from executor import Executor
 from file import File
 from metadata_helper import MetadataHelper
 from PIL import Image
@@ -10,7 +11,7 @@ from util import Util
 
 
 class ThumbnailGenerator:
-    def __init__(self, config=None, util=None, metadata_helper=None):
+    def __init__(self, config=None, util=None, metadata_helper=None, executor=None):
         if config is None:
             config = Config()
 
@@ -20,9 +21,13 @@ class ThumbnailGenerator:
         if metadata_helper is None:
             metadata_helper = MetadataHelper()
 
+        if executor is None:
+            executor = Executor()
+
         self.config = config
         self.util = util
         self.metadata_helper = metadata_helper
+        self.executor = executor
 
     def generate_thumbnail(self, path_to_file, path_to_thumbnail):
         thumbnail_dir = os.path.dirname(path_to_thumbnail)
@@ -37,20 +42,9 @@ class ThumbnailGenerator:
             original_image.thumbnail((thumbnail_size, thumbnail_size), Image.ANTIALIAS)
             original_image.save(path_to_thumbnail)
         elif f.is_video():
-            video_stream = ffvideo.VideoStream(path_to_file, frame_size=(thumbnail_size, None), frame_mode='RGB')
-            video_thumbnail = video_stream.get_frame_at_sec(0).image()
-
-            rotation = self.metadata_helper.get_rotation(path_to_file)
-            if rotation == 90:
-                video_thumbnail.transpose(Image.ROTATE_270)
-            elif rotation == 180:
-                video_thumbnail.transpose(Image.ROTATE_180)
-            elif rotation == 270:
-                video_thumbnail.transpose(Image.ROTATE_90)
-            elif rotation != 0:
-                logging.error('Invalid rotation value detected! path_to_file=%s rotation=%d', path_to_file, rotation)
-                raise RuntimeError('Invalid rotation!')
-
-            video_thumbnail.save(path_to_thumbnail)
+            ffmpeg_cmd = ['ffmpeg', '-i', path_to_file, '-vframes', '1', '-ss', '0', '-vf',
+                          'scale="\'if(gte(iw,ih),' + str(thumbnail_size) + ',-1)\':\'if(lte(ih,iw),-1,' +
+                          str(thumbnail_size) + ')\'"', path_to_thumbnail]
+            self.executor.execute(ffmpeg_cmd)
         else:
             raise RuntimeError('Unrecognized file extension!')
