@@ -72,33 +72,33 @@ class TestPreprocessor(unittest.TestCase):
         self.mock_first_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
                                                                       exif=self.mock_exif_data)
 
-    def test_it_should_rotate_by_90_and_flip_vertically_an_image_with_a_rotation_of_5(self):
+    def test_it_should_rotate_by_270_and_flip_horizontally_an_image_with_a_rotation_of_5(self):
         self.mock_metadata_helper.get_rotation.return_value = 5
-        self.test_model.preprocess('/root/staging/USB/image.jpg')
-        self.mock_image.transpose.assert_called_once_with(Image.ROTATE_90)
-        self.mock_first_transposed_image.transpose.assert_called_once_with(Image.FLIP_LEFT_RIGHT)
-        self.mock_second_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
-                                                                       exif=self.mock_exif_data)
-
-    def test_it_should_rotate_by_90_an_image_with_a_rotation_of_6(self):
-        self.mock_metadata_helper.get_rotation.return_value = 6
-        self.test_model.preprocess('/root/staging/USB/image.jpg')
-        self.mock_image.transpose.assert_called_once_with(Image.ROTATE_90)
-        self.mock_first_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
-                                                                      exif=self.mock_exif_data)
-
-    def test_it_should_flip_horizontally_and_rotate_by_90_an_image_with_a_rotation_of_7(self):
-        self.mock_metadata_helper.get_rotation.return_value = 7
         self.test_model.preprocess('/root/staging/USB/image.jpg')
         self.mock_image.transpose.assert_called_once_with(Image.FLIP_LEFT_RIGHT)
         self.mock_first_transposed_image.transpose.assert_called_once_with(Image.ROTATE_90)
         self.mock_second_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
                                                                        exif=self.mock_exif_data)
 
-    def test_it_should_rotate_by_270_an_image_with_a_rotation_of_8(self):
-        self.mock_metadata_helper.get_rotation.return_value = 8
+    def test_it_should_rotate_by_270_an_image_with_a_rotation_of_6(self):
+        self.mock_metadata_helper.get_rotation.return_value = 6
         self.test_model.preprocess('/root/staging/USB/image.jpg')
         self.mock_image.transpose.assert_called_once_with(Image.ROTATE_270)
+        self.mock_first_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
+                                                                      exif=self.mock_exif_data)
+
+    def test_it_should_rotate_by_90_and_flip_horizontally_an_image_with_a_rotation_of_7(self):
+        self.mock_metadata_helper.get_rotation.return_value = 7
+        self.test_model.preprocess('/root/staging/USB/image.jpg')
+        self.mock_image.transpose.assert_called_once_with(Image.ROTATE_90)
+        self.mock_first_transposed_image.transpose.assert_called_once_with(Image.FLIP_LEFT_RIGHT)
+        self.mock_second_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
+                                                                       exif=self.mock_exif_data)
+
+    def test_it_should_rotate_by_90_an_image_with_a_rotation_of_8(self):
+        self.mock_metadata_helper.get_rotation.return_value = 8
+        self.test_model.preprocess('/root/staging/USB/image.jpg')
+        self.mock_image.transpose.assert_called_once_with(Image.ROTATE_90)
         self.mock_first_transposed_image.save.assert_called_once_with('/root/staging/USB/image.jpg',
                                                                       exif=self.mock_exif_data)
 

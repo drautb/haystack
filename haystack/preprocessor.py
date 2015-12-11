@@ -37,15 +37,15 @@ class Preprocessor:
         elif rotation == 4:
             image = image.transpose(Image.FLIP_TOP_BOTTOM)
         elif rotation == 5:
-            image = image.transpose(Image.ROTATE_90)
             image = image.transpose(Image.FLIP_LEFT_RIGHT)
+            image = image.transpose(Image.ROTATE_90)
         elif rotation == 6:
-            image = image.transpose(Image.ROTATE_90)
-        elif rotation == 7:
-            image = image.transpose(Image.FLIP_LEFT_RIGHT)
-            image = image.transpose(Image.ROTATE_90)
-        elif rotation == 8:
             image = image.transpose(Image.ROTATE_270)
+        elif rotation == 7:
+            image = image.transpose(Image.ROTATE_90)
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        elif rotation == 8:
+            image = image.transpose(Image.ROTATE_90)
 
         image.save(path_to_file, exif=exif_data)
 
