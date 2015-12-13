@@ -1,0 +1,22 @@
+Attempting to connect device(s)
+mtp-folders: Successfully connected
+Android device detected, assigning default bug flags
+Friendly name: (NULL)
+Storage: Internal storage
+1	Music
+2	Podcasts
+6	Pictures
+2270	  Messenger
+2305	  Screenshots
+7	Movies
+8	Download
+9	DCIM
+28	  Camera
+65	  .thumbnails
+12	Android
+13	  data
+14	    com.google.android.videos
+15	      files
+16	        Movies
+2815	  .bkg
+OK.

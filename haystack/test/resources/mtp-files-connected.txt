@@ -1,0 +1,60 @@
+libmtp version: 1.1.8
+
+Android device detected, assigning default bug flags
+mtp-files: Successfully connected
+Listing File Information on Device with name: (NULL)
+File ID: 10
+   Filename: hangouts_message.ogg
+   File size 30056 (0x0000000000007568) bytes
+   Parent ID: 3
+   Storage ID: 0x00010001
+   Filetype: Ogg container format
+File ID: 11
+   Filename: hangouts_incoming_call.ogg
+   File size 76425 (0x0000000000012A89) bytes
+   Parent ID: 3
+   Storage ID: 0x00010001
+   Filetype: Ogg container format
+File ID: 43
+   Filename: IMG_20150613_115842622.jpg
+   File size 1286823 (0x000000000013A2A7) bytes
+   Parent ID: 28
+   Storage ID: 0x00010001
+   Filetype: JPEG file
+File ID: 44
+   Filename: IMG_20150613_115844849.jpg
+   File size 1328437 (0x0000000000144535) bytes
+   Parent ID: 28
+   Storage ID: 0x00010001
+   Filetype: JPEG file
+File ID: 45
+   Filename: IMG_20150616_083227764.jpg
+   File size 838619 (0x00000000000CCBDB) bytes
+   Parent ID: 28
+   Storage ID: 0x00010001
+   Filetype: JPEG file
+File ID: 52
+   Filename: emeals-30-minute-family-plan.pdf
+   File size 447742 (0x000000000006D4FE) bytes
+   Parent ID: 8
+   Storage ID: 0x00010001
+   Filetype: Undefined filetype
+File ID: 53
+   Filename: emeals-30-minute-for2-plan.pdf
+   File size 239629 (0x000000000003A80D) bytes
+   Parent ID: 8
+   Storage ID: 0x00010001
+   Filetype: Undefined filetype
+File ID: 7723
+   Filename: IMG_20151211_115247128.jpg
+   File size 1323560 (0x0000000000143228) bytes
+   Parent ID: 28
+   Storage ID: 0x00010001
+   Filetype: JPEG file
+File ID: 7725
+   Filename: VID_20151211_153724770.mp4
+   File size 140120613 (0x00000000085A1225) bytes
+   Parent ID: 28
+   Storage ID: 0x00010001
+   Filetype: MPEG video stream
+OK.
