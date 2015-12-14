@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+NAME="haystack-server"
+SCRIPT="/usr/sbin/lighttpd -D -f lighttpd.conf"
+
+DAEMON_LOG="--errlog=/var/log/haystack/server-daemon.log"
+CLIENT_LOG="--output=/var/log/haystack/server.log"
+
+# Get the location of the running location.
+DAEMON_CHDIR="--chdir=/home/pi/haystack"
+DAEMON_USER_GROUP="--user=pi:pi"
+
+DAEMON_START_MSG="Starting Haystack Server"
+DAEMON_STOP_MSG="Stopping Haystack Server"
+
+DAEMON_CMD="daemon $DAEMON_USER_GROUP --name=$NAME"
+
+fail_unless_root() {
+  if [ "$(id -u)" != "0" ] ; then
+    log_failure_msg "$NAME must be run as root"
+    exit 1
+  fi
+}
+
+is_running() {
+  $DAEMON_CMD --running
+}
+
+start_daemon() {
+  is_running && return 0
+  $DAEMON_CMD $DAEMON_CHDIR --respawn --command="$SCRIPT" $DAEMON_LOG $CLIENT_LOG
+  sleep 1
+  is_running
+}
+
+stop_daemon() {
+  is_running || return 0
+  $DAEMON_CMD --stop
+}
+
+case $1 in
+  start)
+    echo "$DAEMON_START_MSG"
+    fail_unless_root
+    start_daemon
+    ;;
+  stop)
+    echo "$DAEMON_STOP_MSG"
+    fail_unless_root
+    stop_daemon
+    ;;
+  restart)
+    fail_unless_root
+    stop_daemon
+    sleep 5
+    start_daemon
+    ;;
+  status)
+    # Status of Daemon
+    is_running
+    ;;
+  *)
+    echo "Usage: $0 (start|stop|restart|status)"
+    exit 1
+    ;;
+esac
