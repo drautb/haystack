@@ -27,7 +27,8 @@
         "__init__.py"
       ],
       "folder_exclude_patterns": [
-        "__pycache__"
+        "__pycache__",
+        "node_modules"
       ],
       "follow_symlinks": true,
       "path": "."
