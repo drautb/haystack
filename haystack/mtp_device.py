@@ -5,6 +5,8 @@ import sys
 
 from config import Config
 from file import File
+from mtp_driver import MTPDriver
+from mtp_object import MTPObject
 from util import Util
 
 
@@ -14,7 +16,7 @@ class MTPDevice:
             config = Config()
 
         if mtp is None:
-            mtp = pymtp.MTP()
+            mtp = MTPDriver()
 
         if util is None:
             util = Util()
@@ -60,8 +62,8 @@ class MTPDevice:
         folders_to_index = self.config.mtp_media_directories()
         logging.info('Folders to index: %s', folders_to_index)
         for f in folders:
-            if f['name'] in folders_to_index:
-                ids.append(f['id'])
+            if f.name in folders_to_index:
+                ids.append(f.id)
 
         return ids
 
@@ -75,8 +77,8 @@ class MTPDevice:
             current_length = len(folder_ids)
 
             for f in complete_folder_list:
-                if f['parent_id'] in folder_ids:
-                    folder_ids.add(f['id'])
+                if f.parent_id in folder_ids:
+                    folder_ids.add(f.id)
 
             new_length = len(folder_ids)
 
@@ -87,7 +89,7 @@ class MTPDevice:
         files_in_folders = []
 
         for f in self.mtp.get_filelisting():
-            if f['parent_id'] in folder_ids:
+            if f.parent_id in folder_ids:
                 files_in_folders.append(f)
 
         return files_in_folders
@@ -97,24 +99,24 @@ class MTPDevice:
 
     def __transfer_file(self, src_file, dest_dir):
         try:
-            f = File(src_file['name'])
+            f = File(src_file.name)
         except RuntimeError:
-            logging.warn('Found unrecognized file in folders to index, skipping. filename=%s', src_file['name'])
+            logging.warn('Found unrecognized file in folders to index, skipping. filename=%s', src_file.name)
             return
 
-        dest_file = '{}/{}'.format(dest_dir, src_file['name'])
+        dest_file = '{}/{}'.format(dest_dir, src_file.name)
         logging.info('Downloading file from device. file_id=%s filename=%s destination=%s',
-                     src_file['id'], src_file['name'], dest_file)
-        self.mtp.get_file_to_file(src_file['id'], dest_file)
+                     src_file.id, src_file.name, dest_file)
+        self.mtp.get_file_to_file(src_file.id, dest_file)
 
         # Make sure it's successful before deleting.
         if not os.path.isfile(dest_file):
             logging.info('Download failed! dest_file was does not exist. file_id=%s dest_file=%s',
-                         src_file['id'], dest_file)
-        elif os.path.getsize(dest_file) != src_file['size']:
+                         src_file.id, dest_file)
+        elif os.path.getsize(dest_file) != src_file.size:
             logging.info('Download failed! dest_file size does not match expected.' +
                          ' file_id=%s dest_file=%s dest_file_size=%s src_file_size=%s',
-                         src_file['id'], dest_file, os.path.getsize(dest_file), src_file['size'])
+                         src_file.id, dest_file, os.path.getsize(dest_file), src_file.size)
         else:
             logging.info('Download succeeded, deleting file from dest_file=%s', dest_file)
-            self.mtp.delete_object(src_file['id'])
+            self.mtp.delete_object(src_file.id)

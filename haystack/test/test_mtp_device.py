@@ -8,24 +8,16 @@ from mock import MagicMock
 from mock import patch
 from mtp_device import MTPDevice
 from mtp_driver import MTPDriver
+from mtp_object import MTPObject
 
 
 class TestMTPDevice(unittest.TestCase):
 
     def mock_folder(self, name, id, parent_id=None):
-        return {
-            'id': id,
-            'name': name,
-            'parent_id': parent_id
-        }
+        return MTPObject(id, name, parent_id)
 
     def mock_file(self, name, id, parent_id, size):
-        return {
-            'id': id,
-            'name': name,
-            'parent_id': parent_id,
-            'size': size
-        }
+        return MTPObject(id, name, parent_id, size)
 
     def setUp_mtp_get_folder_list(self, mock_mtp):
         folder_list = [self.mock_folder('Downloads', 1),

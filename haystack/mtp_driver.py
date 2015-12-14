@@ -2,6 +2,7 @@ import logging
 import re
 
 from executor import Executor
+from mtp_object import MTPObject
 
 MANUFACTURER_REGEX = re.compile('   Manufacturer: (.*)')
 MODEL_REGEX = re.compile('   Model: (.*)')
@@ -12,8 +13,6 @@ SPACES_PER_LEVEL = 2
 
 ID_KEY = 'id'
 NAME_KEY = 'name'
-SIZE_KEY = 'size'
-PARENT_KEY = 'parent_id'
 DEPTH_KEY = 'depth'
 
 FILE_ID_REGEX = re.compile('^File ID: (\d+)')
@@ -73,7 +72,7 @@ class MTPDriver:
             parent_id = parents_stack[-1]
             current_depth = depth
             last_id = folder_id
-            folder_list.append({ID_KEY: folder_id, NAME_KEY: folder_name, PARENT_KEY: parent_id})
+            folder_list.append(MTPObject(folder_id, folder_name, parent_id))
 
         return folder_list
 
@@ -85,18 +84,18 @@ class MTPDriver:
             del output[0]
 
         file_list = []
-        current_file = {}
+        current_file = MTPObject(None, None)
         for line in output:
             if FILE_ID_REGEX.match(line):
-                current_file[ID_KEY] = int(FILE_ID_REGEX.search(line).group(1))
+                current_file.id = int(FILE_ID_REGEX.search(line).group(1))
             elif FILE_NAME_REGEX.match(line):
-                current_file[NAME_KEY] = FILE_NAME_REGEX.search(line).group(1)
+                current_file.name = FILE_NAME_REGEX.search(line).group(1)
             elif FILE_SIZE_REGEX.match(line):
-                current_file[SIZE_KEY] = int(FILE_SIZE_REGEX.search(line).group(1))
+                current_file.size = int(FILE_SIZE_REGEX.search(line).group(1))
             elif PARENT_ID_REGEX.match(line):
-                current_file[PARENT_KEY] = int(PARENT_ID_REGEX.search(line).group(1))
+                current_file.parent_id = int(PARENT_ID_REGEX.search(line).group(1))
                 file_list.append(current_file)
-                current_file = {}
+                current_file = MTPObject(None, None)
 
         return file_list
 
