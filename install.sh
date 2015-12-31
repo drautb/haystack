@@ -16,7 +16,8 @@ sudo apt-get install daemon \
                      mtp-tools \
                      python \
                      python-dev \
-                     python-pip
+                     python-pip \
+                     screen
 
 sudo pip install configparser \
                  funcsigs \

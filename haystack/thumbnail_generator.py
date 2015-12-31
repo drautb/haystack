@@ -1,4 +1,3 @@
-import ffvideo
 import logging
 import os
 

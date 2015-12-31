@@ -1,5 +1,4 @@
 import unittest
-import pymtp
 import util
 
 from config import Config
