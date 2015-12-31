@@ -14,6 +14,8 @@ sudo apt-get install daemon \
                      libswscale-dev \
                      lighttpd \
                      mtp-tools \
+                     ntfs-3g \
+                     pastebinit \
                      python \
                      python-dev \
                      python-pip \
