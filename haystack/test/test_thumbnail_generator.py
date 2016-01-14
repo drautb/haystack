@@ -84,7 +84,7 @@ class TestThumbnailGenerator(unittest.TestCase):
 
     def test_it_should_get_video_thumbnails_using_the_right_ffmpeg_command(self):
         self.__run_video_test()
-        expected_cmd = ['ffmpeg', '-i', PATH_TO_VIDEO_FILE, '-vframes', '1', '-ss', '0', '-vf',
+        expected_cmd = ['ffmpeg', '-y', '-i', PATH_TO_VIDEO_FILE, '-vframes', '1', '-ss', '0', '-vf',
                         'scale=\'if(gte(iw,ih),128,-1)\':\'if(gte(iw,ih),-1,128)\'', PATH_TO_VIDEO_THUMBNAIL]
         self.mock_executor.execute.assert_called_once_with(expected_cmd)
 
@@ -92,7 +92,7 @@ class TestThumbnailGenerator(unittest.TestCase):
         self.mock_config.thumbnail_size.return_value = 196
 
         self.__run_video_test()
-        expected_cmd = ['ffmpeg', '-i', PATH_TO_VIDEO_FILE, '-vframes', '1', '-ss', '0', '-vf',
+        expected_cmd = ['ffmpeg', '-y', '-i', PATH_TO_VIDEO_FILE, '-vframes', '1', '-ss', '0', '-vf',
                         'scale=\'if(gte(iw,ih),196,-1)\':\'if(gte(iw,ih),-1,196)\'', PATH_TO_VIDEO_THUMBNAIL]
         self.mock_executor.execute.assert_called_once_with(expected_cmd)
 
