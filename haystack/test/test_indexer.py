@@ -40,7 +40,7 @@ def mock_staging_dir(*args):
 class TestIndexer(unittest.TestCase):
     def __reset_listdir_mapping(self):
         LISTDIR_MAPPING[('/root/staging',)] = ['device-serial-1']
-        LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.jpg']
+        LISTDIR_MAPPING[('/root/staging/device-serial-1',)] = ['file.jpg', '.fuse_hiddenxxxx']
 
     def __reset_isdir_mapping(self):
         ISDIR_MAPPING[('/root/staging',)] = True
