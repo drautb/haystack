@@ -119,15 +119,18 @@ class TestIndexer(unittest.TestCase):
         self.test_model.run()
         self.mock_util.mkdirp.assert_called_once_with('/root/staging')
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_preprocess_the_file(self):
         self.test_model.run()
         self.mock_preprocessor.preprocess.assert_called_once_with('/root/staging/device-serial-1/file.jpg')
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail(self):
         expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.test_model.run()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(ANY, expected_path_to_thumbnail)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_file(self):
         expected_path_to_file = '/root/staging/device-serial-1/file.jpg'
         self.test_model.run()
@@ -146,28 +149,34 @@ class TestIndexer(unittest.TestCase):
 
     # The indexed paths are relative to the root because that is where the file server will run from.
     # It would be _bad_ to have a file server running at '/', instead of somewhere lower.
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_final_path(self):
         expected_path_to_file = 'pictures/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(expected_path_to_file, ANY, ANY, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_thumbnail_path(self):
         expected_path_to_thumbnail = 'thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(ANY, expected_path_to_thumbnail, ANY, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_date_taken(self):
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, 1449176000, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_device_id(self):
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, 'device-serial-1', ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_hash(self):
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, '6c8abb37a65a74b526d456927a19549d', ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_media_type(self):
         self.test_model.run()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, ANY, 'JPG')
@@ -176,16 +185,19 @@ class TestIndexer(unittest.TestCase):
         self.test_model.run()
         self.mock_remove.assert_called_once_with('/root/staging/device-serial-1/file.jpg')
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_not_delete_staged_media_if_an_error_occurred_during_indexing(self):
         self.mock_index.index_media.side_effect = RuntimeError
         self.test_model.run()
         self.mock_remove.assert_not_called()
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail_for_mp4_videos(self):
         expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.__run_mp4_test()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(ANY, expected_path_to_thumbnail)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_file_for_mp4_videos(self):
         expected_path_to_file = '/root/staging/device-serial-1/file.mp4'
         self.__run_mp4_test()
@@ -206,28 +218,34 @@ class TestIndexer(unittest.TestCase):
         self.mock_copy.assert_called_once_with('/root/staging/device-serial-1/file.mp4',
                                                '/root/videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4')
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_final_path_for_mp4_videos(self):
         expected_path_to_file = 'videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4'
         self.__run_mp4_test()
         self.mock_index.index_media.assert_called_once_with(expected_path_to_file, ANY, ANY, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_thumbnail_path_for_mp4_videos(self):
         expected_path_to_thumbnail = 'thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.__run_mp4_test()
         self.mock_index.index_media.assert_called_once_with(ANY, expected_path_to_thumbnail, ANY, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_date_taken_for_mp4_videos(self):
         self.__run_mp4_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, 1449176000, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_device_id_for_mp4_videos(self):
         self.__run_mp4_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, 'device-serial-1', ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_hash_for_mp4_videos(self):
         self.__run_mp4_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, '6c8abb37a65a74b526d456927a19549d', ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_media_type_for_mp4_videos(self):
         self.__run_mp4_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, ANY, 'MP4')
@@ -236,26 +254,31 @@ class TestIndexer(unittest.TestCase):
         self.__run_mp4_test()
         self.mock_remove.assert_called_once_with('/root/staging/device-serial-1/file.mp4')
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_thumbnail_for_mts_videos(self):
         expected_path_to_thumbnail = '/root/thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.__run_mp4_test()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(ANY, expected_path_to_thumbnail)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_generate_a_thumbnail_using_the_expected_path_to_file_for_mts_videos(self):
         expected_path_to_file = '/root/staging/device-serial-1/file.mts'
         self.__run_mts_test()
         self.mock_thumbnail_generator.generate_thumbnail.assert_called_once_with(expected_path_to_file, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_convert_mts_videos_to_mp4_using_the_right_source_file(self):
         self.__run_mts_test()
         self.mock_video_converter.convert_to_mp4.assert_called_once_with('/root/staging/device-serial-1/file.mts',
                                                                          ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_convert_mts_videos_to_mp4_using_the_right_dest_file(self):
         self.__run_mts_test()
         (self.mock_video_converter.convert_to_mp4
             .assert_called_once_with(ANY, '/root/videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4', ANY))
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_convert_mts_videos_to_mp4_using_the_right_create_time(self):
         self.__run_mts_test()
         self.mock_video_converter.convert_to_mp4.assert_called_once_with(ANY, ANY, 1449176000)
@@ -267,32 +290,39 @@ class TestIndexer(unittest.TestCase):
         self.mock_util.mkdirp.assert_called_once_with('/root/videos/2015/12/3')
 
     # We don't have to copy it because the conversion placed it there already.
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_not_copy_media_from_the_staging_location_to_the_final_location_for_mts_videos(self):
         self.__run_mts_test()
         self.mock_copy.assert_not_called()
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_final_path_for_mts_videos(self):
         expected_path_to_file = 'videos/2015/12/3/6c8abb37a65a74b526d456927a19549d.mp4'
         self.__run_mts_test()
         self.mock_index.index_media.assert_called_once_with(expected_path_to_file, ANY, ANY, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_thumbnail_path_for_mts_videos(self):
         expected_path_to_thumbnail = 'thumbnails/2015/12/3/6c8abb37a65a74b526d456927a19549d.jpg'
         self.__run_mts_test()
         self.mock_index.index_media.assert_called_once_with(ANY, expected_path_to_thumbnail, ANY, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_date_taken_for_mts_videos(self):
         self.__run_mts_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, 1449176000, ANY, ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_device_id_for_mts_videos(self):
         self.__run_mts_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, 'device-serial-1', ANY, ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_media_with_the_right_hash_for_mts_videos(self):
         self.__run_mts_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, '6c8abb37a65a74b526d456927a19549d', ANY)
 
+    @unittest.skip("disabling advanced functionality")
     def test_it_should_index_converted_mts_videos_as_mp4(self):
         self.__run_mts_test()
         self.mock_index.index_media.assert_called_once_with(ANY, ANY, ANY, ANY, ANY, 'MP4')

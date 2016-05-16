@@ -112,14 +112,14 @@ class Indexer:
         logging.info('Indexing file=%s', path_to_file)
 
         # Preprocess files. (Rotate images properly)
-        self.preprocessor.preprocess(path_to_file)
+        # self.preprocessor.preprocess(path_to_file)
 
         file_hash = self.__get_media_hash(path_to_file)
-        if self.index.is_duplicate(file_hash):
-            logging.info('File hash already appears in index, file appears to be a duplicate, and will be deleted. ' +
-                         'path_to_file=%s file_hash=%s', path_to_file, file_hash)
-            os.remove(path_to_file)
-            return
+        # if self.index.is_duplicate(file_hash):
+        #     logging.info('File hash already appears in index, file appears to be a duplicate, and will be deleted. ' +
+        #                  'path_to_file=%s file_hash=%s', path_to_file, file_hash)
+        #     os.remove(path_to_file)
+        #     return
 
         try:
             f = File(path_to_file)
@@ -128,8 +128,8 @@ class Indexer:
             date_taken = self.metadata_helper.get_date_taken(path_to_file)
 
             # Generate Thumbnail.
-            path_to_thumbnail = self.__generate_path_to_thumbnail(f, date_taken, file_hash)
-            self.thumbnail_generator.generate_thumbnail(path_to_file, path_to_thumbnail)
+            # path_to_thumbnail = self.__generate_path_to_thumbnail(f, date_taken, file_hash)
+            # self.thumbnail_generator.generate_thumbnail(path_to_file, path_to_thumbnail)
 
             # Copy file to final place, converting .mts to .mp4 if necessary.
             path_to_final_file = self.__generate_path_to_final_file(f, date_taken, file_hash)
@@ -137,27 +137,27 @@ class Indexer:
             if not os.path.isdir(final_directory):
                 self.util.mkdirp(final_directory)
 
-            if f.is_video() and f.media_type() == MTS:
-                path_to_final_file = os.path.splitext(path_to_final_file)[0] + MP4_EXT
-                f = File(path_to_final_file)
-                logging.info('Converting .mts video to .mp4. path_to_file=%s path_to_final_file=%s create_time=%d',
-                             path_to_file, path_to_final_file, date_taken)
-                self.video_converter.convert_to_mp4(path_to_file, path_to_final_file, date_taken)
-            else:
-                logging.info('Copying staged media to final location. path_to_staged_file=%s path_to_final_file=%s',
-                             path_to_file, path_to_final_file)
-                shutil.copy(path_to_file, path_to_final_file)
+            # if f.is_video() and f.media_type() == MTS:
+            #     path_to_final_file = os.path.splitext(path_to_final_file)[0] + MP4_EXT
+            #     f = File(path_to_final_file)
+            #     logging.info('Converting .mts video to .mp4. path_to_file=%s path_to_final_file=%s create_time=%d',
+            #                  path_to_file, path_to_final_file, date_taken)
+            #     self.video_converter.convert_to_mp4(path_to_file, path_to_final_file, date_taken)
+            # else:
+            logging.info('Copying staged media to final location. path_to_staged_file=%s path_to_final_file=%s',
+                         path_to_file, path_to_final_file)
+            shutil.copy(path_to_file, path_to_final_file)
 
             # Send data to index. We strip off the root location so that all indexed paths are relative to the haystack
             # root. This allows us to start the static file server in haystack root, rather than at the root of the
             # file system.
-            haystack_root = self.config.haystack_root()
-            if not haystack_root.endswith(SLASH):
-                haystack_root += SLASH
+            # haystack_root = self.config.haystack_root()
+            # if not haystack_root.endswith(SLASH):
+            #     haystack_root += SLASH
 
-            self.index.index_media(path_to_final_file.replace(haystack_root, EMPTY, 1),
-                                   path_to_thumbnail.replace(haystack_root, EMPTY, 1),
-                                   date_taken, device, file_hash, f.media_type())
+            # self.index.index_media(path_to_final_file.replace(haystack_root, EMPTY, 1),
+            #                        path_to_thumbnail.replace(haystack_root, EMPTY, 1),
+            #                        date_taken, device, file_hash, f.media_type())
 
             # Remove file after successful indexing.
             logging.info('Removing file=%s', path_to_file)
