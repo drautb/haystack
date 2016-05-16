@@ -19,3 +19,10 @@ sudo ./bin/haystack-server {start|stop|restart|status}
 ## Development Notes
 
 * Lint in Sublime Text 3 with `SublimeLinter-pep8`.
+
+## TODOs
+
+* Some .MTS videos aren't getting converted properly. :( In one example, (perhaps others)
+the video gets scaled and there is a green bar on the right side???
+* The transfer should ignore unrecognized files, like .DS_Store
+
